@@ -13,14 +13,14 @@
 
 int8_t mode;
 
-int stepDelay      = 2500;
+int stepDelay      = 25;
 
 int startingDelay  = 4000;
 int minDelay       = 2000;
 int rampUpSpeed      = 10;
 int rampDownSpeed      = 2;
 
-uint8_t hysteresis = 5;
+uint8_t hysteresis = 15;
 
 void setup() {
   Serial.begin(57600);
@@ -37,7 +37,7 @@ void setup() {
   mode = MODE_RAMPUP;
 }
 
-int targetPos = 500;
+int targetPos = 600;
 boolean dir = false;
 boolean moving = false;
 
@@ -72,13 +72,13 @@ void loop() {
     moving = false;
   }
   
-  Serial.print(currentPos);
-  Serial.print(' ');
-  Serial.print(targetPos);
-  Serial.print(' ');
-  Serial.print(dir);
-  Serial.print(' ');
-  Serial.println(moving);
+//  Serial.print(currentPos);
+//  Serial.print(' ');
+//  Serial.print(targetPos);
+//  Serial.print(' ');
+//  Serial.print(dir);
+//  Serial.print(' ');
+//  Serial.println(moving);
 }
 
 
