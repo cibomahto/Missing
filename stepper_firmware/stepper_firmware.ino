@@ -13,18 +13,21 @@
 
 int8_t mode;
 
-int stepDelay      = 500000;
+int stepDelay      = 2500;
 
 int startingDelay  = 4000;
 int minDelay       = 2000;
 int rampUpSpeed      = 10;
 int rampDownSpeed      = 2;
 
+uint8_t hysteresis = 5;
+
 void setup() {
   Serial.begin(57600);
   
   pinMode(LED_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
+  pinMode(DIR_PIN, OUTPUT);
   pinMode(ENABLE_PIN, OUTPUT);
 
   digitalWrite(ENABLE_PIN, LOW);
@@ -35,26 +38,47 @@ void setup() {
 }
 
 int targetPos = 500;
+boolean dir = false;
+boolean moving = false;
 
 void loop() {
+//  int targetPos = analogRead(TARGET_INPUT);
+
+  if(Serial.available()) {
+    char in = Serial.read();
+    if(in >= '0' && in <= '9') {
+      targetPos = (in - '0' + 1)*100;
+    }
+  }
+
   int currentPos = analogRead(POT_INPUT);
-  Serial.println(currentPos);
   
-  if (abs(targetPos - currentPos) > 50) {
+  if (abs(targetPos - currentPos) > hysteresis) {
     if (targetPos > currentPos) {
+      dir = false;
       digitalWrite(DIR_PIN, LOW);
-  
     }
     else {
+      dir = true;
       digitalWrite(DIR_PIN, HIGH);
     }
     
+    moving = true;
     digitalWrite(STEP_PIN, HIGH);
     digitalWrite(STEP_PIN, LOW);
     delayMicroseconds(stepDelay);
-    delayMicroseconds(stepDelay);
-    delayMicroseconds(stepDelay);
   }
+  else {
+    moving = false;
+  }
+  
+  Serial.print(currentPos);
+  Serial.print(' ');
+  Serial.print(targetPos);
+  Serial.print(' ');
+  Serial.print(dir);
+  Serial.print(' ');
+  Serial.println(moving);
 }
 
 
