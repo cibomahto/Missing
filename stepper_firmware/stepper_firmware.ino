@@ -3,16 +3,32 @@
 #define STEP_PIN        2
 #define DIR_PIN         3
 #define ENABLE_PIN      4
-#define LED_PIN         11
-//#define CURRENT_REF_PIN 9
+#define LED_PIN         13
+#define CURRENT_REF_PIN 9
 
 // Analog input
 #define POSITION_PIN    0
 
-uint8_t hysteresis    = 50;
+const uint8_t movingCurrent   = 25;  // current to apply when moving, in counts
+const uint8_t holdingCurrent  = 10;  // current to apply when holding, in counts
 
-int targetPos;
-boolean dir;
+uint8_t hysteresis            = 20;  // overshoot amount
+
+uint8_t currentStepDelay      = 200;
+const uint8_t minStepDelay    = 40;
+const uint8_t maxStepDelay    = 140;
+
+uint8_t stepDelayAcceleration = 2;
+uint8_t stepDelayDeceleration = 2;
+int     decelerateOffset      = 80;  // fudge factor, since we aren't doing real trapezoidal acceleration.
+
+uint16_t lastPos;
+uint16_t targetPos;
+
+//#define CLOCKWISE        false
+//#define COUNTERCLOCKWISE true
+//boolean dir;
+
 boolean moving;
 
 void setup() {
@@ -27,10 +43,10 @@ void setup() {
   digitalWrite(STEP_PIN, LOW);      // Reset the step input
   digitalWrite(ENABLE_PIN, LOW);    // Enable the stepper driver
 
-//  analogWrite(CURRENT_REF_PIN, 25); // Set the current reference to a low value
+  analogWrite(CURRENT_REF_PIN, 20); // Set the current reference to a low value
   
+  lastPos = analogRead(POSITION_PIN);
   targetPos = 600;
-  dir = false;
   moving = false;
   
   // Set up Timer 2 to generate interrupts on overflow, and start it.
@@ -47,14 +63,17 @@ void setup() {
 
 void loop() {
 
-  if(Serial.available()) {
-    char in = Serial.read();
-    if(in >= '0' && in <= '9') {
-      cli();
-      targetPos = (in - '0' + 1)*100;
-      sei();
-    }
-  }
+  targetPos = random(1,10)*100;
+  delay(random(1,6)*1000);
+  
+//  if(Serial.available()) {
+//    char in = Serial.read();
+//    if(in >= '0' && in <= '9') {
+//      cli();
+//      targetPos = (in - '0' + 1)*100;
+//      sei();
+//    }
+//  }
   
 //  Serial.print(currentPos);
 //  Serial.print(' ');
@@ -65,26 +84,21 @@ void loop() {
 //  Serial.println(moving);
 }
 
-uint8_t currentStepDelay = 200;
-uint8_t minStepDelay = 60;
-uint8_t maxStepDelay = 255;
 
-uint8_t stepDelayAcceleration = 2;
 
 // Servo loop
 ISR(TIMER2_COMPA_vect)
 {  
-  int currentPos = analogRead(POSITION_PIN);
+  uint16_t currentPos = analogRead(POSITION_PIN);
   
   if (abs(targetPos - currentPos) > hysteresis) {
-    // If we should be moving, make a move
-    
+    // If we should be moving, make a move    
+    analogWrite(CURRENT_REF_PIN, movingCurrent);
+
     if (targetPos > currentPos) {
-      dir = false;
       digitalWrite(DIR_PIN, LOW);
     }
     else {
-      dir = true;
       digitalWrite(DIR_PIN, HIGH);
     }
     
@@ -94,22 +108,24 @@ ISR(TIMER2_COMPA_vect)
     
     // Now, determine if we should be speeding up/slowing down
     // note we are not considering directioN!!
-    if(abs(targetPos - currentPos) > 100) {
+    if(abs(targetPos - currentPos) > decelerateOffset) {
+
       // try to accelerate
       if (currentStepDelay > minStepDelay) {
         currentStepDelay -= stepDelayAcceleration;
       }
     }
-    else {    
+    else {
       // try to accelerate
       if (currentStepDelay < maxStepDelay) {
-        currentStepDelay += stepDelayAcceleration;
+        currentStepDelay += stepDelayDeceleration;
       }
     }
   }
   else {
-    // We are not mobing.
-      
+    // We are not moving.
+    analogWrite(CURRENT_REF_PIN, holdingCurrent);
+    
     moving = false;
     currentStepDelay = maxStepDelay;
   }
