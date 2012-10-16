@@ -778,16 +778,16 @@ design rules under a new name.</description>
 <contactref element="C7" pad="1"/>
 <contactref element="IC4" pad="5"/>
 <polygon width="0.4064" layer="1">
-<vertex x="-1.27" y="73.66"/>
-<vertex x="73.66" y="73.66"/>
-<vertex x="73.66" y="-2.54"/>
-<vertex x="-1.27" y="-2.54"/>
+<vertex x="-2.54" y="50.8"/>
+<vertex x="50.8" y="50.8"/>
+<vertex x="50.8" y="-2.54"/>
+<vertex x="-2.54" y="-2.54"/>
 </polygon>
 <polygon width="0.4064" layer="16">
-<vertex x="-1.27" y="73.66"/>
-<vertex x="73.66" y="73.66"/>
-<vertex x="73.66" y="-2.54"/>
-<vertex x="-1.27" y="-2.54"/>
+<vertex x="-2.54" y="50.8"/>
+<vertex x="50.8" y="50.8"/>
+<vertex x="50.8" y="-2.54"/>
+<vertex x="-2.54" y="-2.54"/>
 </polygon>
 <contactref element="U$1" pad="GND"/>
 <contactref element="U$1" pad="GND1"/>
@@ -1377,37 +1377,6 @@ design rules under a new name.</description>
 <wire x1="40.1066" y1="30.9118" x2="43.053" y2="27.9654" width="1.778" layer="1"/>
 </signal>
 </signals>
-<errors>
-<approved hash="3,1,7ee905013d055ef7"/>
-<approved hash="5,1,fcd75f8285ca8195"/>
-<approved hash="5,1,f4075f82852a89a5"/>
-<approved hash="5,1,f8ef5f9285ca85bd"/>
-<approved hash="5,1,f01f5fb285ea8d4d"/>
-<approved hash="5,1,e84f5f9285ca951d"/>
-<approved hash="5,1,ec375f8285ca9175"/>
-<approved hash="5,1,e4675f8285ea9905"/>
-<approved hash="5,1,72cc757b308739a9"/>
-<approved hash="5,1,18d8c14b048fe7b5"/>
-<approved hash="5,1,30dce94b148ff7b1"/>
-<approved hash="5,1,5ac85d7b208729ad"/>
-<approved hash="5,1,22c4257b508759a1"/>
-<approved hash="5,1,48d0914b648f87bd"/>
-<approved hash="5,1,60d4b94b148ff7b9"/>
-<approved hash="5,1,0ac00d7b208729a5"/>
-<approved hash="5,1,12bc157b308739d9"/>
-<approved hash="5,1,78a8a14b048fe7c5"/>
-<approved hash="5,1,90ac494b148ff7c1"/>
-<approved hash="5,1,fab8fd7b208729dd"/>
-<approved hash="5,1,a8a0714b248fc7cd"/>
-<approved hash="5,1,c2b4c57b108719d1"/>
-<approved hash="5,1,e5e94b3e8cea8d3b"/>
-<approved hash="5,1,f9c14b0e8cca9103"/>
-<approved hash="5,1,f1914b0e8cea9973"/>
-<approved hash="5,1,fdb94b1e8cca956b"/>
-<approved hash="5,1,e1f14b0e8c2a89d3"/>
-<approved hash="5,1,e9214b0e8cca81e3"/>
-<approved hash="5,1,ed194b1e8cca85cb"/>
-</errors>
 </board>
 </drawing>
 </eagle>
