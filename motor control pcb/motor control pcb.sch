@@ -2195,7 +2195,12 @@ Standard 4-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <connect gate="1" pin="6" pad="6"/>
 </connects>
 <technologies>
-<technology name=""/>
+<technology name="">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
 </technologies>
 </device>
 <device name="L" package="ML6L">
@@ -2208,7 +2213,12 @@ Standard 4-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <connect gate="1" pin="6" pad="6"/>
 </connects>
 <technologies>
-<technology name=""/>
+<technology name="">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="unknown" constant="no"/>
+</technology>
 </technologies>
 </device>
 </devices>
@@ -2388,10 +2398,10 @@ Standard 4-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <pad name="2B" x="16.51" y="13.97" drill="0.8" shape="square"/>
 <pad name="GND3" x="16.51" y="16.51" drill="0.8" shape="square"/>
 <pad name="VMOT" x="16.51" y="19.05" drill="0.8" shape="square"/>
-<wire x1="0" y1="0" x2="0" y2="35.56" width="0.127" layer="20"/>
-<wire x1="0" y1="35.56" x2="17.78" y2="35.56" width="0.127" layer="20"/>
-<wire x1="17.78" y1="35.56" x2="17.78" y2="0" width="0.127" layer="20"/>
-<wire x1="17.78" y1="0" x2="0" y2="0" width="0.127" layer="20"/>
+<wire x1="0" y1="0" x2="0" y2="35.56" width="0.127" layer="21"/>
+<wire x1="0" y1="35.56" x2="17.78" y2="35.56" width="0.127" layer="21"/>
+<wire x1="17.78" y1="35.56" x2="17.78" y2="0" width="0.127" layer="21"/>
+<wire x1="17.78" y1="0" x2="0" y2="0" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
