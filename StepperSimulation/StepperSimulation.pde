@@ -1,5 +1,6 @@
 // possible problem: what if we are sending more steps than the motor can handle?
 // how does it respond if we tell it to step 10 times but in the process it can only do 8?
+// would also make sense to change the current as the motor is accelerating/decelerating?
 
 PFont font;
 int fontSize = 16;
