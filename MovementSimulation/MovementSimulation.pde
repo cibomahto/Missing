@@ -9,15 +9,15 @@ void setup() {
   noFill();
   noSmooth();
 
-  if (false) {
+  if (true) {
     debug = true;
     speakers = new Speaker[1];
-    speakers[0] = new Speaker(width / 4, height / 4, width / 2, height / 2);
+    speakers[0] = new Speaker(width / 4, height / 2, width / 2, height / 2);
   } 
   else {
     debug = false;
     speakers = new Speaker[32];
-    float speakerDistance = 100;
+    float speakerDistance = 80;
     for (int i = 0; i < speakers.length; i++) {
       while (true) {
         float cx = random(width), cy = random(height);
@@ -38,8 +38,8 @@ void setup() {
 }
 
 void draw() {
-  mx = mouseX;
-  my = mouseY;
+  mx = map(noise(frameCount * .01 + 100), 0, 1, width / 4, 3 * width / 4);//mouseX;
+  my = map(noise(frameCount * .01 + 001), 0, 1, height / 4, 3 * height / 4);//mouseY;
 
   background(0);
   for (int i = 0; i < speakers.length; i++) {

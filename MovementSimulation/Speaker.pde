@@ -41,7 +41,7 @@ class Speaker {
     popMatrix();
   }
   
-  void followMouse() {
+  void update() {
     PVector actual = new PVector(my - y, mx - x);
     actual.rotate(orientation);
     float realAngle = atan2(actual.x, actual.y);
@@ -69,10 +69,6 @@ class Speaker {
       moving = false;
     }
     prevMoving = moving;
-  }
-  
-  void update() {
-    followMouse();
   }
   
   void draw() {
