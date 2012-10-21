@@ -1,7 +1,7 @@
 boolean debug = false;
 
 class Speaker {
-  float currentAngle, smoothAngle, actualAngle;
+  float prevAngle, currentAngle, smoothAngle, actualAngle;
   float smoothRate = .1;
   float actualSmoothRate = .1;
   float maxSpeed = .01;
@@ -10,13 +10,15 @@ class Speaker {
   float movingHysteresis = radians(1);
   float minHysteresis = radians(5);
   float stillHysteresis = radians(30);
+  float backwardsHysteresis = PI - (PI / 8);
   float curHysteresis;
   float stillWait = .99;
   
-  float x, y;
-  Speaker(float x, float y) {
+  float x, y, orientation;
+  Speaker(float x, float y, float tx, float ty) {
     this.x = x;
     this.y = y;
+    this.orientation = atan2(ty - y, tx - x);
   }
   
   void drawAngle(float angle) {
@@ -40,7 +42,16 @@ class Speaker {
   }
   
   void followMouse() {
-    currentAngle = atan2(my - y, mx - x);
+    PVector actual = new PVector(my - y, mx - x);
+    actual.rotate(orientation);
+    float realAngle = atan2(actual.x, actual.y);
+    if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
+      (prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {
+      currentAngle = prevAngle;
+    } else {
+      currentAngle = realAngle;
+    }
+    prevAngle = currentAngle;
     
     float nextAngle = lerp(smoothAngle, currentAngle, smoothRate);
     smoothAngle += constrain(nextAngle - smoothAngle, -maxSpeed, maxSpeed);
@@ -67,6 +78,7 @@ class Speaker {
   void draw() {
     pushMatrix();
     translate(x, y);
+    rotate(orientation);
     if(debug) {
       stroke(255);
       drawAngle(currentAngle);
