@@ -1,6 +1,9 @@
-// possible problem: what if we are sending more steps than the motor can handle?
+// what if we are sending more steps than the motor can handle?
 // how does it respond if we tell it to step 10 times but in the process it can only do 8?
+
 // would also make sense to change the current as the motor is accelerating/decelerating?
+
+// new behavior works better for short moves, but for long moves it will 
 
 PFont font;
 int fontSize = 16;
@@ -21,31 +24,32 @@ int OCR2A = 0;
 void draw() {
   int curISR = millis();
   boolean didISR = false;
-  if(curISR - lastISR > OCR2A) {
+  if (curISR - lastISR > OCR2A) {
     ISR();
     didISR = true;
     lastISR = curISR;
   }
   OCR2AHistory[OCR2At] = OCR2A;
   OCR2At = (OCR2At + 1) % OCR2AHistory.length;
-  
+
   background(0);
-  
+
   pushMatrix();
   translate(20, 20);
   text("OCR2A: " + OCR2A + " " + (didISR ? "ISR" : ""), 0, 0);
   int y = 0;
+  text("lastPos: " + lastPos, 0, y+=fontSize);
   text("targetPos: " + targetPos, 0, y+=fontSize);
   text("currentPos: " + currentPos, 0, y+=fontSize);
-  text("hysteresis: " + hysteresis, 0, y+=fontSize);
+  text("state: " + state, 0, y+=fontSize);
   text("moving: " + moving, 0, y+=fontSize);
   popMatrix();
-  
+
   pushMatrix();
   translate(width / 2, height / 2);
   drawStepper(128);
   popMatrix();
-  
+
   translate(0, height - maxStepDelay - 10);
   noFill();
   stroke(128);
@@ -53,15 +57,15 @@ void draw() {
   line(0, maxStepDelay, width, maxStepDelay);
   stroke(255);
   beginShape();
-  for(int i = 0; i < OCR2AHistory.length; i++) {
+  for (int i = 0; i < OCR2AHistory.length; i++) {
     vertex(i, OCR2AHistory[i]);
   }
   endShape();
 }
 
 void keyPressed() {
-  if(key == ' ') {
-    targetPos = (int)random(0,1024);
+  if (key == ' ') {
+    seekPosition(int(random(0, 1024)));
   }
 }
 
@@ -76,18 +80,25 @@ int CURRENT_REF_PIN = 9;
 // const
 int movingCurrent = 25;
 int holdingCurrent = 10;
-int stepDelayAcceleration = 2;
-int stepDelayDeceleration = 2;
-int decelerateOffset = 80;
+int stepDelayAcceleration = 4;
+int stepDelayDeceleration = 4;
+int stepDecelerationOffset = 150; // how much space does it take to decelerate from full speed?
 int currentStepDelay = 200;
 int minStepDelay = 40;
 int maxStepDelay = 140;
+int hysteresis = 10;
 
 // variable
+int lastPos = 0;
 int targetPos = 0;
 int currentPos = 0;
-int hysteresis = 20;
+float state;
 boolean moving = false;
+
+void seekPosition(int newPosition) {
+  lastPos = currentPos;
+  targetPos = newPosition;
+}
 
 void ISR() {
   currentPos = analogRead(POSITION_PIN);
@@ -108,18 +119,17 @@ void ISR() {
     digitalWrite(STEP_PIN, LOW);
 
     // Now, determine if we should be speeding up/slowing down
-    // note we are not considering directioN!!
-    if (abs(targetPos - currentPos) > decelerateOffset) {
-
-      // try to accelerate
+    // note we are not considering direction!
+    int diffPos = abs(currentPos - lastPos);
+    int range =  abs(targetPos - lastPos);
+    state = float(diffPos) / range;
+    if(state > .5) {
+      if(currentStepDelay < maxStepDelay && (range - diffPos) < stepDecelerationOffset) {
+        currentStepDelay += stepDelayDeceleration;
+      }
+    } else {
       if (currentStepDelay > minStepDelay) {
         currentStepDelay -= stepDelayAcceleration;
-      }
-    }
-    else {
-      // try to accelerate
-      if (currentStepDelay < maxStepDelay) {
-        currentStepDelay += stepDelayDeceleration;
       }
     }
   }

@@ -9,10 +9,11 @@ int stepperPosition = 0;
 boolean stepperDirection = CLOCKWISE;
 boolean previousStepperValue = LOW;
 void digitalWriteStep(boolean value) {
-  if(value == LOW && previousStepperValue == HIGH) {
-    if(stepperDirection == CLOCKWISE) {
+  if (value == LOW && previousStepperValue == HIGH) {
+    if (stepperDirection == CLOCKWISE) {
       stepperPosition++;
-    } else {
+    } 
+    else {
       stepperPosition--;
     }
   }
@@ -39,37 +40,39 @@ void drawStepper(float radius) {
   ellipse(0, 0, radius * 2, radius * 2);
   rotate(getStepperRotation());
   line(0, 0, radius, 0);
-  
-    scale(10, 10);
-    translate(-7.5, 0);
-    beginShape();
-    vertex(15, 6.5);
-    vertex(0, 5);
-    vertex(0, -5);
-    vertex(15, -6.5);
-    endShape(CLOSE);
-    
+
+  scale(10, 10);
+  translate(-7.5, 0);
+  beginShape();
+  vertex(15, 6.5);
+  vertex(0, 5);
+  vertex(0, -5);
+  vertex(15, -6.5);
+  endShape(CLOSE);
+
   popStyle();
-  popMatrix(); 
+  popMatrix();
 }
 
 void digitalWrite(int pin, boolean value) {
-  if(pin == STEP_PIN) {
+  if (pin == STEP_PIN) {
     digitalWriteStep(value);
-  } else if(pin == DIR_PIN) {
+  } 
+  else if (pin == DIR_PIN) {
     digitalWriteDir(value);
   }
 }
 
 void analogWrite(int pin, int value) {
-  if(pin == CURRENT_REF_PIN) {
+  if (pin == CURRENT_REF_PIN) {
     // should control torque
   }
 }
 
 int analogRead(int pin) {
-  if(pin == POSITION_PIN) {
+  if (pin == POSITION_PIN) {
     return analogReadPosition();
   }
   return 0;
 }
+
