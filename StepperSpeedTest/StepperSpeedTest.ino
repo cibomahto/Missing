@@ -4,8 +4,8 @@
 #define LED_PIN         13
 #define CURRENT_REF_PIN 9
 
-uint8_t movingCurrent = 40, stillCurrent = 10;
-uint8_t slowStep = 90, fastStep = 30;
+const uint8_t movingCurrent = 40, stillCurrent = 10;
+const uint8_t slowStep = 90, fastStep = 30;
 boolean pause = false;
 
 void setup() {
@@ -29,12 +29,9 @@ void setup() {
   TCCR2A  = (1<<WGM21)|(0<<WGM20);
   TCCR2B  = (0<<WGM22)|(1<<CS22)|(1<<CS21)|(1<<CS20);
   TIMSK2  = (1<<OCIE2A);
-  OCR2A = slowStep;
+  OCR2A   = slowStep;
   sei();
 }
-
-uint16_t totalSteps = 0;
-boolean lastPause = false;
 
 void loop() {  
   if(Serial.available()) {
@@ -59,31 +56,15 @@ void loop() {
 ISR(TIMER2_COMPA_vect) {  
   if(!pause) {
     analogWrite(CURRENT_REF_PIN, movingCurrent);
-
     digitalWrite(STEP_PIN, HIGH);
     digitalWrite(STEP_PIN, LOW);
-
     if(OCR2A > fastStep) {
       OCR2A--;
     }
   } 
   else {
-    if(pause != lastPause) {
-      analogWrite(CURRENT_REF_PIN, stillCurrent);
-    } 
-    if(OCR2A < slowStep) {
-      OCR2A--;
-      digitalWrite(STEP_PIN, HIGH);
-      digitalWrite(STEP_PIN, LOW);
-    } 
-    else {
-      OCR2A = slowStep;
-    }
-  }
-  lastPause = pause;
-
-  if(OCR2A == slowStep) {
     analogWrite(CURRENT_REF_PIN, stillCurrent);
+    OCR2A = slowStep;
   }
 }
 
