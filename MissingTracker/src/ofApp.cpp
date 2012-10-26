@@ -10,7 +10,7 @@ void ofApp::setup() {
 	panel.addSlider("calibrationTime", 4, 1, 10);
 	panel.addSlider("calibrationProgress", 0, 0, 1);
 	panel.addToggle("calibrate");
-	panel.addSlider("threshold", 4, 0, 64, true);
+	panel.addSlider("threshold", 8, 0, 64, true);
 	
 	calibrating = false;
 	calibrationStart = 0;
@@ -35,7 +35,7 @@ void ofApp::update() {
 		calibrating = true;
 		clearBackground = true;
 	}
-
+	
 	kinect.update();
 	if(kinect.isFrameNew()) {
 		unsigned char* kinectPixels = kinect.getDepthPixels();
@@ -66,14 +66,23 @@ void ofApp::update() {
 		}
 		
 		int threshold = panel.getValueI("threshold");
-		for(int i = 0; i < n; i++) {
-			int kinectPixel = kinectPixels[i];
-			int backgroundPixel = backgroundPixels[i];
-			bool far = abs(kinectPixel - backgroundPixel) > threshold;
-			if(far && kinectPixel > 0 && backgroundPixel > 0) {
-				resultPixels[i] = 255;
-			} else {
-				resultPixels[i] = 0;
+		const unsigned short* rawDepthPixels = kinect.getRawDepthPixels();
+		int width = kinect.getWidth(), height = kinect.getHeight();
+		foregroundCloud.setMode(OF_PRIMITIVE_POINTS);
+		foregroundCloud.clear();
+		int i = 0;
+		for(int y = 0; y < height; y++) {
+			for(int x = 0; x < width; x++) {
+				int kinectPixel = kinectPixels[i];
+				int backgroundPixel = backgroundPixels[i];
+				bool far = abs(kinectPixel - backgroundPixel) > threshold;
+				if(far && kinectPixel > 0 && backgroundPixel > 0) {
+					resultPixels[i] = 255;
+					foregroundCloud.addVertex(kinect.getWorldCoordinateAt(x, y, rawDepthPixels[i]));
+				} else {
+					resultPixels[i] = 0;
+				}
+				i++;
 			}
 		}
 		
@@ -86,6 +95,15 @@ void ofApp::draw() {
 	kinect.drawDepth(640, 0);
 	background.draw(0, 480);
 	result.draw(640, 480);
+	
+	cam.begin();
+	ofSetColor(0);
+	glPointSize(3);
+	foregroundCloud.draw();
+	ofSetColor(255);
+	glPointSize(1);
+	foregroundCloud.draw();
+	cam.end();
 }
 
 void ofApp::exit() {
