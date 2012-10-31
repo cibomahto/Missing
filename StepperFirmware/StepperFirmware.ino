@@ -1,41 +1,85 @@
-#define STEP_PIN        2
-#define DIR_PIN         3
-#define ENABLE_PIN      4
-#define LED_PIN         13
-#define CURRENT_REF_PIN 9
-#define POSITION_PIN    0
 
-const uint8_t movingCurrent = 40, stillCurrent = 40;
-const uint8_t slowStep = 90, fastStep = 30, reverseStep = 160;
+#define R_ENABLE_PIN    2
+#define D_ENABLE_PIN    3
+
+
+#define MS1_PIN         11
+#define MS2_PIN         10
+#define MS3_PIN         8
+#define RESET_PIN       7
+#define ENABLE_PIN      12
+
+#define STEP_PIN        6
+#define DIR_PIN         5
+
+#define LED_PIN         4
+
+#define CURRENT_REF_PIN 9
+
+#define POSITION_INPUT  7
+
+
+const uint8_t movingCurrent = 20;
+const uint8_t stillCurrent  = 5;
+const uint8_t slowStep = 90;
+const uint8_t fastStep = 30;
+const uint8_t reverseStep = 160;
+
+//const uint8_t slowStep = 240;
+//const uint8_t fastStep = 200;
+//const uint8_t reverseStep = 240;
+
 const uint8_t hysteresis = 20;
 
-uint16_t targetPosition = 512, currentPosition;
-boolean lastNear = true, lastDirection = false;
+uint16_t targetPosition = 512;
+uint16_t currentPosition;
+boolean lastNear = true;
+boolean lastDirection = false;
+
 
 void setup() {
-  Serial.begin(57600);
-
+  // Turn on the LED
   pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
+
+  // Set up the RS485 interface
+  digitalWrite(R_ENABLE_PIN, LOW);
+  digitalWrite(D_ENABLE_PIN, LOW);
+  pinMode(R_ENABLE_PIN, OUTPUT);
+  pinMode(D_ENABLE_PIN, OUTPUT);
+  Serial.begin(57600);
+  
+  // Disable the stepper driver, configure it, then turn it back on.
+  digitalWrite(ENABLE_PIN, HIGH);
+  pinMode(ENABLE_PIN, OUTPUT);
+  
+  pinMode(RESET_PIN, OUTPUT);
+  pinMode(MS1_PIN, OUTPUT);
+  pinMode(MS2_PIN, OUTPUT);
+  pinMode(MS3_PIN, OUTPUT);
+  digitalWrite(RESET_PIN, HIGH);
+  digitalWrite(MS1_PIN, HIGH);
+  digitalWrite(MS2_PIN, HIGH);
+  digitalWrite(MS3_PIN, HIGH);
+
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
-  pinMode(ENABLE_PIN, OUTPUT);
-
-  digitalWrite(LED_PIN, HIGH); //Turn the LED on
-  digitalWrite(STEP_PIN, LOW); // Reset the step input
-  digitalWrite(ENABLE_PIN, LOW); // Enable the stepper driver
-
+  digitalWrite(STEP_PIN, LOW);
   digitalWrite(DIR_PIN, LOW);
+  
+  digitalWrite(ENABLE_PIN, LOW);
 
   // Set up Timer 2
   cli();
   TCNT2   = 0;
-  OCR2A   = 255;
   TCCR2A  = (1<<WGM21)|(0<<WGM20);
   TCCR2B  = (0<<WGM22)|(1<<CS22)|(1<<CS21)|(1<<CS20);
   TIMSK2  = (1<<OCIE2A);
   OCR2A   = slowStep;
   sei();
 }
+
+
 
 void loop() {
   // jump to random positions
@@ -66,7 +110,7 @@ void loop() {
 }
 
 ISR(TIMER2_COMPA_vect) {  
-  currentPosition = analogRead(POSITION_PIN);
+  currentPosition = analogRead(POSITION_INPUT);
   
   boolean near = abs(currentPosition - targetPosition) < hysteresis;
   boolean curDirection = targetPosition > currentPosition;
@@ -83,13 +127,17 @@ ISR(TIMER2_COMPA_vect) {
     if(OCR2A > fastStep) {
       OCR2A--;
     }
+    digitalWrite(LED_PIN, HIGH);
   } 
   else {
     analogWrite(CURRENT_REF_PIN, stillCurrent);
     OCR2A = slowStep;
+    
+    digitalWrite(LED_PIN, LOW);
   }
   lastNear = near;
 }
+
 
 
 
