@@ -9,6 +9,9 @@ build up a low-resolution (binned) "presence graph"
 do blob detection and tracking
 * add final translation stage for centering data
 * add auto-rotation stage based on plane extraction
+* farther data has fewer points (use triangles area: |ABxAC|/2)
+* mask noisy areas around edges
+* use an iir filter on depth image
 */
 
 #pragma once
@@ -25,13 +28,13 @@ public:
 	void exit();
 	
 	ofxKinect kinect;
-	ofxAutoControlPanel panel;
+	ofxAutoControlPanel gui;
 	bool calibrating, clearBackground;
 	float calibrationStart;
 	
 	ofImage result, background;
 	
-	ofImage presence;
+	ofFloatImage presence;
 	ofMesh foregroundFlat;
 	ofMesh foregroundCloud;
 	ofEasyCam cam;
