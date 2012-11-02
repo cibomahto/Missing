@@ -2,13 +2,11 @@
 #define R_ENABLE_PIN    2
 #define D_ENABLE_PIN    3
 
-
 #define MS1_PIN         11
 #define MS2_PIN         10
 #define MS3_PIN         8
 #define RESET_PIN       7
 #define ENABLE_PIN      12
-
 #define STEP_PIN        6
 #define DIR_PIN         5
 
@@ -18,24 +16,28 @@
 
 #define POSITION_INPUT  7
 
+#define CLOCKWISE                  true
+#define COUNTERCLOCKWISE           false
 
-const uint8_t movingCurrent = 20;
-const uint8_t stillCurrent  = 5;
-const uint8_t slowStep = 90;
-const uint8_t fastStep = 30;
-const uint8_t reverseStep = 160;
+const uint8_t movingCurrent        = 45;
+const uint8_t holdingCurrent       = 20;
 
-//const uint8_t slowStep = 240;
-//const uint8_t fastStep = 200;
-//const uint8_t reverseStep = 240;
+const uint16_t minStepDelay        = 4000;
+const uint16_t maxStepDelay        = 8000;
+uint16_t currentStepDelay;
 
-const uint8_t hysteresis = 20;
+boolean currentDirection           = CLOCKWISE;
 
-uint16_t targetPosition = 512;
-uint16_t currentPosition;
-boolean lastNear = true;
-boolean lastDirection = false;
+uint8_t stepDelayAcceleration      = 100;
+uint8_t stepDelayDeceleration      = 400;
+uint8_t decelerateOffset           = 20; // fudge factor, since we aren't doing real trapezoidal acceleration.
 
+const uint8_t stopHysteresis       = 2;  // How close we have to be from the target to stop moving
+const uint8_t startHysteresis      = 30;  // How far from the target we have to be to start moving
+boolean moving                     = false;
+
+int16_t targetPosition             = 512;
+int16_t currentPosition;
 
 void setup() {
   // Turn on the LED
@@ -69,73 +71,129 @@ void setup() {
   
   digitalWrite(ENABLE_PIN, LOW);
 
+  currentStepDelay = maxStepDelay;
+  
   // Set up Timer 2
   cli();
   TCNT2   = 0;
   TCCR2A  = (1<<WGM21)|(0<<WGM20);
   TCCR2B  = (0<<WGM22)|(1<<CS22)|(1<<CS21)|(1<<CS20);
   TIMSK2  = (1<<OCIE2A);
-  OCR2A   = slowStep;
+  OCR2A   = minStepDelay;
   sei();
 }
 
 
 
 void loop() {
-  // jump to random positions
-  targetPosition = random(0, 1024);
-  delay(random(1, 6) * 1000);
+  if(Serial.available()) {
+    char a = Serial.read();
+    if(a >= '1' && a <= '9') {
+      targetPosition = (a - '1')*100;
+    }
+  }
   
-  // use input bytes to indicate 0-255 => 0-1024
-//  while(Serial.available()) {
-//    char in = Serial.read();
-//    targetPosition = 4 * in;
+//  // jump to random positions
+//  targetPosition = random(50, 1024-50);
+////  delay(random(1, 6) * 1000);
+//   
+//  uint8_t d = random(200,200);  
+//  for(uint8_t i = 0; i < d; i++) {
+//    Serial.print(currentPosition);
+//    Serial.print(", ");
+//    Serial.print(targetPosition);
+//    Serial.print(", ");
+//    Serial.print(currentStepDelay);
+//    Serial.print(", ");
+//    Serial.print(currentStepDelay/100);
+//    Serial.print(", ");
+//    Serial.print(currentDirection);
+//    Serial.print(", ");
+//    Serial.print(moving);
+//    Serial.print(", ");
+//    Serial.println(abs(targetPosition - currentPosition));
+//    delay(50);
 //  }
-    
-  // hit enter for a random position
-//  if(Serial.available()) {
-//    char in = Serial.read();
-//    if(in == '\n') {
-//      targetPosition = random(0, 1024);
-//    }
-//  }
-
-  // print target, current, OCR2A
-//  Serial.print(targetPosition);
-//  Serial.print('\t');
-//  Serial.print(currentPosition);
-//  Serial.print('\t');
-//  Serial.println(OCR2A);
-//  delay(100);
 }
 
-ISR(TIMER2_COMPA_vect) {  
+ISR(TIMER2_COMPA_vect) {
+  digitalWrite(LED_PIN, HIGH);
   currentPosition = analogRead(POSITION_INPUT);
   
-  boolean near = abs(currentPosition - targetPosition) < hysteresis;
-  boolean curDirection = targetPosition > currentPosition;
-  digitalWrite(DIR_PIN, curDirection ? LOW : HIGH);
-  if(!lastNear && curDirection != lastDirection) {
-    OCR2A = reverseStep;
-  }
-  lastDirection = curDirection;
-  
-  if(!near) {
+  // If we should be moving
+  if (abs(targetPosition - currentPosition) > startHysteresis || moving == true) {
     analogWrite(CURRENT_REF_PIN, movingCurrent);
+
+    // Now, there are three states we could be in. If currentStepDelay is equal to
+    // maxStepDelay, then we just started a move, and should be sure to reset the direction pin
+
+    // If we are at a stop, set the new direction and make a move
+    if (currentStepDelay == maxStepDelay) {
+      if (targetPosition > currentPosition) {
+        currentDirection = CLOCKWISE; // todo: backwards?
+        digitalWrite(DIR_PIN, LOW);
+      }
+      else {
+        currentDirection = COUNTERCLOCKWISE;
+        digitalWrite(DIR_PIN, HIGH);
+      }
+    }
+    
     digitalWrite(STEP_PIN, HIGH);
     digitalWrite(STEP_PIN, LOW);
-    if(OCR2A > fastStep) {
-      OCR2A--;
+
+    // Now, let's figure out acceleration or deceleration for the next move.
+    // If we have velocity in the wrong direction, just burn some of it off
+    if ((targetPosition < currentPosition) == currentDirection) {
+        if (currentStepDelay < maxStepDelay) {
+          currentStepDelay += stepDelayAcceleration;
+        }
+        if (currentStepDelay > maxStepDelay) {
+          currentStepDelay = maxStepDelay;
+        }
     }
-    digitalWrite(LED_PIN, HIGH);
-  } 
-  else {
-    analogWrite(CURRENT_REF_PIN, stillCurrent);
-    OCR2A = slowStep;
+    // Otherwise, do the normal trapezoid thing here.
+    else {
+      // Now, determine if we should be speeding up/slowing down
+      // note we are not considering directioN!!
+      if(abs(targetPosition - currentPosition) > decelerateOffset) {
+        // try to accelerate
+        if (currentStepDelay > minStepDelay) {
+          currentStepDelay -= stepDelayAcceleration;
+        }
+        if (currentStepDelay < minStepDelay) {
+          currentStepDelay = minStepDelay;
+        }
+      }
+      else {
+        // try to decelerate
+        if (currentStepDelay < maxStepDelay) {
+          currentStepDelay += stepDelayDeceleration;
+        }
+        if (currentStepDelay > maxStepDelay) {
+          currentStepDelay = maxStepDelay;
+        }
+      }
+    }
     
-    digitalWrite(LED_PIN, LOW);
+    // If we got within the stop hysterisis band, mark as not moving.
+    if (abs(targetPosition - currentPosition) > stopHysteresis) {
+      moving = true;
+    }
+    else {
+      moving = false;
+    }
   }
-  lastNear = near;
+  else {
+    // We are not moving.
+    analogWrite(CURRENT_REF_PIN, holdingCurrent);
+
+    
+    currentStepDelay = maxStepDelay;
+  }
+  
+  OCR2A = currentStepDelay/100;
+  digitalWrite(LED_PIN, LOW);
 }
 
 
