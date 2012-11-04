@@ -19,11 +19,11 @@
 #define CLOCKWISE                  true
 #define COUNTERCLOCKWISE           false
 
-const uint8_t movingCurrent        = 45;
+const uint8_t movingCurrent        = 35;
 const uint8_t holdingCurrent       = 20;
 
-const uint16_t minStepDelay        = 4000;
-const uint16_t maxStepDelay        = 8000;
+const uint16_t minStepDelay        = 8000;
+const uint16_t maxStepDelay        = 16000;
 uint16_t currentStepDelay;
 
 boolean currentDirection           = CLOCKWISE;
@@ -45,8 +45,8 @@ void setup() {
   digitalWrite(LED_PIN, HIGH);
 
   // Set up the RS485 interface
-  digitalWrite(R_ENABLE_PIN, LOW);
-  digitalWrite(D_ENABLE_PIN, LOW);
+  digitalWrite(R_ENABLE_PIN, HIGH);  //Note: output mode.
+  digitalWrite(D_ENABLE_PIN, HIGH);
   pinMode(R_ENABLE_PIN, OUTPUT);
   pinMode(D_ENABLE_PIN, OUTPUT);
   Serial.begin(57600);
@@ -62,13 +62,15 @@ void setup() {
   digitalWrite(RESET_PIN, HIGH);
   digitalWrite(MS1_PIN, HIGH);
   digitalWrite(MS2_PIN, HIGH);
-  digitalWrite(MS3_PIN, HIGH);
+  digitalWrite(MS3_PIN, LOW);
 
   pinMode(STEP_PIN, OUTPUT);
   pinMode(DIR_PIN, OUTPUT);
   digitalWrite(STEP_PIN, LOW);
   digitalWrite(DIR_PIN, LOW);
   
+  analogWrite(CURRENT_REF_PIN, holdingCurrent);
+    
   digitalWrite(ENABLE_PIN, LOW);
 
   currentStepDelay = maxStepDelay;
@@ -86,44 +88,44 @@ void setup() {
 
 
 void loop() {
-  if(Serial.available()) {
-    char a = Serial.read();
-    if(a >= '1' && a <= '9') {
-      targetPosition = (a - '1')*100;
-    }
-  }
-  
-//  // jump to random positions
-//  targetPosition = random(50, 1024-50);
-////  delay(random(1, 6) * 1000);
-//   
-//  uint8_t d = random(200,200);  
-//  for(uint8_t i = 0; i < d; i++) {
-//    Serial.print(currentPosition);
-//    Serial.print(", ");
-//    Serial.print(targetPosition);
-//    Serial.print(", ");
-//    Serial.print(currentStepDelay);
-//    Serial.print(", ");
-//    Serial.print(currentStepDelay/100);
-//    Serial.print(", ");
-//    Serial.print(currentDirection);
-//    Serial.print(", ");
-//    Serial.print(moving);
-//    Serial.print(", ");
-//    Serial.println(abs(targetPosition - currentPosition));
-//    delay(50);
+//  if(Serial.available()) {
+//    char a = Serial.read();
+//    if(a >= '1' && a <= '9') {
+//      targetPosition = (a - '1')*100;
+//    }
 //  }
+  
+  // jump to random positions
+  targetPosition = random(50, 1024-50);
+//  delay(random(1, 6) * 1000);
+   
+  uint8_t d = random(200,200);  
+  for(uint8_t i = 0; i < d; i++) {
+    Serial.print(currentPosition);
+    Serial.print(", ");
+    Serial.print(targetPosition);
+    Serial.print(", ");
+    Serial.print(currentStepDelay);
+    Serial.print(", ");
+    Serial.print(currentStepDelay/100);
+    Serial.print(", ");
+    Serial.print(currentDirection);
+    Serial.print(", ");
+    Serial.print(moving);
+    Serial.print(", ");
+    Serial.println(abs(targetPosition - currentPosition));
+    delay(50);
+  }
 }
 
 ISR(TIMER2_COMPA_vect) {
-  digitalWrite(LED_PIN, HIGH);
   currentPosition = analogRead(POSITION_INPUT);
   
   // If we should be moving
   if (abs(targetPosition - currentPosition) > startHysteresis || moving == true) {
     analogWrite(CURRENT_REF_PIN, movingCurrent);
-
+    digitalWrite(LED_PIN, HIGH);
+    
     // Now, there are three states we could be in. If currentStepDelay is equal to
     // maxStepDelay, then we just started a move, and should be sure to reset the direction pin
 
@@ -187,13 +189,12 @@ ISR(TIMER2_COMPA_vect) {
   else {
     // We are not moving.
     analogWrite(CURRENT_REF_PIN, holdingCurrent);
-
+    digitalWrite(LED_PIN, LOW);
     
     currentStepDelay = maxStepDelay;
   }
   
   OCR2A = currentStepDelay/100;
-  digitalWrite(LED_PIN, LOW);
 }
 
 
