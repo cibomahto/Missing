@@ -51,6 +51,16 @@ bool distanceToReference(const ofVec3f& a, const ofVec3f& b) {
 	return a.distance(referencePoint) < b.distance(referencePoint);
 }
 
+float movingHysteresis = 1;
+float minHysteresis = 5;
+float stillHysteresis = 30;
+float backwardsHysteresis = 160;
+float curHysteresis;
+float stillWait = .99;
+float smoothRate = .1;
+float actualSmoothRate = .1;
+float maxSpeed = .01;
+
 void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
 	this->position = position;
 	label = ofToString(count++);
@@ -62,10 +72,17 @@ void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
 	wires.addVertex(a);
 	wires.addVertex(b);
 	wires.addVertex(c);
-	// could also determine the real orientation from wires, but its' more work
+	// could also determine the real orientation from wires, but it's more work
 	orientation = -position;
 	orientation.normalize();
 	baseRotation = play3Orientation.angle(orientation);
+	
+	prevMoving = false;
+	moving = false;
+	prevAngle = 0;
+	currentAngle = 0;
+	smoothAngle = 0;
+	actualAngle = 0;
 }
 
 void Speaker::draw() {
@@ -76,7 +93,7 @@ void Speaker::draw() {
 	ofTranslate(0, 0, position.z);
 	ofLine(ofVec2f(0, 0), orientation * feetToMillimeters(1));
 	ofPushMatrix();
-	ofRotateZ(baseRotation + rotation);
+	ofRotateZ(baseRotation + actualAngle);
 	play3.draw();
 	ofPopMatrix();
 	ofPopMatrix();
@@ -97,8 +114,36 @@ ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
 
 void Speaker::update(vector<ofVec2f>& listeners) {
 	ofVec2f closest = getClosestPoint(listeners, position);
-	ofVec2f direction = closest - position;
-	rotation = orientation.angle(direction);
+	ofVec2f actual = closest - position;
+	actualAngle = orientation.angle(actual);
+	/*
+	actual.rotate(baseRotation);
+	float realAngle = ofRadToDeg(atan2f(actual.y, actual.x));
+	if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
+		(prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {
+		currentAngle = prevAngle;
+	} else {
+		currentAngle = realAngle;
+	}
+	prevAngle = currentAngle;
+	
+	float nextAngle = ofLerp(smoothAngle, currentAngle, smoothRate);
+	smoothAngle += ofClamp(nextAngle - smoothAngle, -maxSpeed, maxSpeed);
+	
+	if(fabsf(currentAngle - actualAngle) > curHysteresis) {
+		actualAngle = ofLerp(actualAngle, smoothAngle, actualSmoothRate);
+		curHysteresis = movingHysteresis;
+		moving = true;
+	} else {
+		if(prevMoving) {
+			curHysteresis = stillHysteresis;
+		} else {
+			curHysteresis = MAX(minHysteresis, curHysteresis * stillWait);
+		}
+		moving = false;
+	}
+	prevMoving = moving;
+	*/ 
 }
 
 void ofApp::setup() {
@@ -141,10 +186,10 @@ void ofApp::buildSpeakers() {
 
 void ofApp::update() {
 	listeners.clear();
-	if(ofGetKeyPressed('q')) {
+	if(ofGetKeyPressed('m')) {
 		listeners.push_back(ofVec2f(0, 0));
 	}
-	if(ofGetKeyPressed('w')) {
+	if(ofGetKeyPressed(' ')) {
 		listeners.push_back(ofVec2f(
 			ofMap(mouseX, 0, ofGetWidth(), -stageSize / 2, stageSize / 2),
 			ofMap(mouseY, 0, ofGetHeight(), stageSize / 2, -stageSize / 2)));

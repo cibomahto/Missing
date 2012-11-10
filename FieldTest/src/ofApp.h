@@ -11,9 +11,13 @@ protected:
 	
 	ofVec3f position;
 	ofVec2f orientation;
-	float baseRotation, rotation;
+	float baseRotation;
 	ofMesh wires;
 	string label;
+	
+	float prevAngle, currentAngle, smoothAngle, actualAngle;  
+  bool prevMoving, moving;
+	
 public:
 	static void setupMesh();
 	void setup(ofVec3f position, ofMesh& wires);
