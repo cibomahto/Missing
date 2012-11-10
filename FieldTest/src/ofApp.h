@@ -3,6 +3,7 @@
 #include "ofMain.h"
 
 #include "ofxAssimpModelLoader.h"
+#include "DriverInterface.h"
 
 class Speaker {
 protected:
