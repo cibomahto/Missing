@@ -3,6 +3,9 @@
 #include "ofMain.h"
 
 #include "ofxAssimpModelLoader.h"
+#include "ofxMidi.h"
+#include "ofxTiming.h"
+
 #include "DriverInterface.h"
 #include "Speaker.h"
 
@@ -31,4 +34,10 @@ public:
 	
 	DriverInterface driver;
 	ofTrueTypeFont font;
+	
+	ofxMidiOut midi;
+	
+	bool rawPresence;
+	Hysteresis presence;
+	FadeTimer volume;
 };

@@ -33,7 +33,9 @@ float maxSpeed = .5;
 
 void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
 	this->position = position;
-	label = ofToString(count++);
+	float crimpPosition = position.z + mountOffset;
+	label = ofToString(count++) + " " + ofToString((int) millimetersToInches(crimpPosition));
+	//label = ofToString((int) millimetersToInches(crimpPosition)) + "in";
 	
 	vector<ofVec3f> centers = wiresCloud.getVertices();
 	referencePoint = position;
@@ -67,10 +69,13 @@ void drawAngle(float angle, ofColor color) {
 
 void Speaker::draw(bool showLabel) {
 	ofPushMatrix();
+	ofLine(ofVec2f(position), ofVec2f(position) + orientation * feetToMillimeters(1));
+	
+	wires.drawWireframe();
 	ofTranslate(0, 0, position.z + mountOffset);
 	wires.drawWireframe();
 	ofPopMatrix();
-	
+
 	ofPushMatrix();
 	ofTranslate(position.x, position.y);
 	ofPushStyle();
@@ -81,6 +86,7 @@ void Speaker::draw(bool showLabel) {
 	ofPopStyle();
 	ofTranslate(0, 0, position.z);
 	ofRotateZ(baseRotation);
+
 	ofLine(ofVec2f(0, 0), play3Orientation * feetToMillimeters(1));
 	
 	drawAngle(actualAngle, ofColor::fromHex(0xffee00));
@@ -89,6 +95,7 @@ void Speaker::draw(bool showLabel) {
 	
 	ofRotateZ(actualAngle);
 	play3.draw();
+
 	ofPopMatrix();
 }
 

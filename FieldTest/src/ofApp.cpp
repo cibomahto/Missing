@@ -4,6 +4,9 @@
  everything on screen is done in millimeters, though data is diverse
 
  need to test with actual serial device
+ autorotate
+ send midi to ableton
+ receive osc describing people's positions
  */
 
 #include "ofApp.h"
@@ -11,7 +14,7 @@
 #include "Conversion.h"
 
 float stageSize = feetInchesToMillimeters(15, 8);
-float stageHeight = feetToMillimeters(10);
+float stageHeight = inchesToMillimeters(118);
 float eyeLevel = feetInchesToMillimeters(5, 8);
 
 void ofApp::setup() {
@@ -22,6 +25,12 @@ void ofApp::setup() {
 	driver.setDeadZone(10);
 	
 	font.loadFont("uni05_53.ttf", 6, false);
+	
+	midi.listPorts();
+	midi.openPort(0);
+	
+	presence.setDelay(.5);
+	volume.setLength(1);
 	
 	Speaker::setupMesh();
 	
@@ -50,10 +59,13 @@ void ofApp::buildWires() {
 
 void ofApp::buildSpeakers() {
 	ofSeedRandom(0);
+	ofFile out;
+	out.open("out.csv");
 	for(int i = 0; i < centersCloud.getNumVertices(); i++) {
 		Speaker speaker;
 		ofVec3f position = centersCloud.getVertex(i);
 		position.z = feetToMillimeters(ofRandom(2, 6));
+		out << position.z << endl;
 		speaker.setup(position, wiresCloud);
 		speakers.push_back(speaker);
 	}
@@ -77,6 +89,11 @@ void ofApp::update() {
 			ofMap(mouseY, 0, ofGetHeight(), stageSize / 2, -stageSize / 2)));
 	}
 	
+	rawPresence = !listeners.empty();
+	presence.update(rawPresence);
+	volume.update(presence);
+	midi.sendControlChange(0, 0, 127 * volume.get());
+	
 	for(int i = 0; i < speakers.size(); i++) {
 		speakers[i].update(listeners);
 	}
@@ -89,6 +106,7 @@ void ofApp::update() {
 }
 
 void ofApp::drawScene(bool showLabels) {
+	ofRotateZ(90); // make north point up
 	ofTranslate(0, 0, -eyeLevel);
 	ofPushMatrix();
 	ofNoFill();
@@ -164,6 +182,19 @@ void ofApp::draw() {
 		msg += ofToString(i, 2, '0') + " 0x" + ofToHex(packet[i]) + "\n";
 	}
 	font.drawString(msg, 10, 10);
+	
+	ofPushMatrix();
+	ofPushStyle();
+	ofTranslate(10, ofGetHeight() - 10);
+	ofScale(100, 1);
+	ofSetColor(ofColor::fromHex(0xffee00));
+	ofLine(0, 0, (rawPresence ? 1 : 0), 0);
+	ofSetColor(ofColor::fromHex(0x00abec));
+	ofLine(0, 2, presence.get(), 2);
+	ofSetColor(ofColor::fromHex(0xec008c));
+	ofLine(0, 4, volume.get(), 4);
+	ofPopStyle();
+	ofPopMatrix();
 }
 
 void ofApp::keyPressed(int key) {

@@ -20,6 +20,10 @@ inline float feetInchesToMillimeters(float feet, float inches) {
 	return inchesToMillimeters(feetToInches(feet) + inches);
 }
 
+inline float millimetersToInches(float millimeters) {
+	return (1/25.4) * millimeters;
+}
+
 inline void scale(ofMesh& mesh, float amount) {
 	for(int i = 0; i < mesh.getNumVertices(); i++) {
 		mesh.getVertices()[i] *= amount;
