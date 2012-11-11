@@ -4,7 +4,6 @@
  everything on screen is done in millimeters, though data is diverse
 
  need to test with actual serial device
- autorotate
  */
 
 #include "ofApp.h"
@@ -13,7 +12,9 @@
 
 float stageSize = feetInchesToMillimeters(15, 8);
 float stageHeight = inchesToMillimeters(118);
-float eyeLevel = feetInchesToMillimeters(5, 8);
+float eyeLevel = stageHeight / 2;
+float rotationSpeed = 2;
+float perspectiveScale = .15;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
@@ -22,7 +23,7 @@ void ofApp::setup() {
 	driver.setup("tty", 9600);
 	driver.setDeadZone(10);
 	
-	font.loadFont("uni05_53.ttf", 6, false);
+	MiniFont::setup();
 	
 	midi.listPorts();
 	midi.openPort(0);
@@ -149,11 +150,6 @@ void ofApp::drawScene(bool showLabels) {
 void ofApp::drawPlan(float x, float y, float side) {
 	ofPushView();
 	ofViewport(x, y, side, side);
-	ofPushStyle();
-	ofFill();
-	ofSetColor(0);
-	ofRect(0, 0, side, side);
-	ofPopStyle();
 	ofSetupScreenOrtho(side, side, OF_ORIENTATION_DEFAULT, false, -stageHeight, stageHeight);
 	ofTranslate(side / 2, side / 2);
 	float scale = side / stageSize;
@@ -165,11 +161,6 @@ void ofApp::drawPlan(float x, float y, float side) {
 void ofApp::drawSection(float x, float y, float side) {
 	ofPushView();
 	ofViewport(x, y, side, side);
-	ofPushStyle();
-	ofFill();
-	ofSetColor(0);
-	ofRect(0, 0, side, side);
-	ofPopStyle();
 	ofSetupScreenOrtho(side, side, OF_ORIENTATION_DEFAULT, false, -stageHeight, stageHeight);
 	ofTranslate(side / 2, side / 2);
 	ofRotateX(-90);
@@ -181,7 +172,9 @@ void ofApp::drawSection(float x, float y, float side) {
 
 void ofApp::drawPerspective() {
 	cam.begin();
-	ofScale(.2, .2, .2);
+	ofScale(perspectiveScale, perspectiveScale, perspectiveScale);
+	ofRotateX(-90);
+	ofRotateZ(rotationSpeed * ofGetElapsedTimef());
 	drawScene(true);
 	cam.end();
 }
@@ -199,7 +192,7 @@ void ofApp::draw() {
 	for(int i = 0; i < packet.size(); i++) {
 		msg += ofToString(i, 2, '0') + " 0x" + ofToHex(packet[i]) + "\n";
 	}
-	font.drawString(msg, 10, 10);
+	MiniFont::draw(msg, 10, 10);
 	
 	ofPushMatrix();
 	ofPushStyle();

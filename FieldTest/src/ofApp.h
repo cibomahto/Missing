@@ -9,6 +9,7 @@
 
 #include "DriverInterface.h"
 #include "Speaker.h"
+#include "MiniFont.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -34,7 +35,6 @@ public:
 	vector<ofVec2f> listeners, oscListeners;
 	
 	DriverInterface driver;
-	ofTrueTypeFont font;
 	
 	ofxMidiOut midi;
 	ofxOscReceiver osc;

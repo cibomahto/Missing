@@ -2,6 +2,7 @@
 
 #include "ofxAssimpModelLoader.h"
 #include "Conversion.h"
+#include "MiniFont.h"
 
 ofVec2f play3Orientation = ofVec2f(-1, 0);
 float mountOffset = centimetersToMillimeters(14);
@@ -34,8 +35,7 @@ float maxSpeed = .5;
 void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
 	this->position = position;
 	float crimpPosition = position.z + mountOffset;
-	label = ofToString(count++) + " " + ofToString((int) millimetersToInches(crimpPosition));
-	//label = ofToString((int) millimetersToInches(crimpPosition)) + "in";
+	label = ofToString(count++) + "/" + ofToString((int) millimetersToInches(crimpPosition)) + "in";
 	
 	vector<ofVec3f> centers = wiresCloud.getVertices();
 	referencePoint = position;
@@ -77,14 +77,15 @@ void Speaker::draw(bool showLabel) {
 	ofPopMatrix();
 
 	ofPushMatrix();
-	ofTranslate(position.x, position.y);
+	
 	ofPushStyle();
 	ofSetColor(255);
 	if(showLabel) {
-		ofDrawBitmapString(label, 0, 0);
+		ofDrawBitmapString(label, position.x, position.y);
 	}
 	ofPopStyle();
-	ofTranslate(0, 0, position.z);
+	
+	ofTranslate(position);
 	ofRotateZ(baseRotation);
 
 	ofLine(ofVec2f(0, 0), play3Orientation * feetToMillimeters(1));
