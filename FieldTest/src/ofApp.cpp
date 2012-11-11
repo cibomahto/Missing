@@ -2,153 +2,33 @@
  z axis is up/down, everything is on the x/y plane
  +z is up, -z is down
  everything on screen is done in millimeters, though data is diverse
+
+ need to test with actual serial device
+ x generate random walks/noise
+ x handle the case where the path goes around the back
+ x separate code into more files
+ x show simulated speaker motion
+ add crc
+ render from multiple perspectives
+ x more debug info
  */
 
 #include "ofApp.h"
 
-float centimetersToMillimeters(float centimeters) {
-	return 10 * centimeters;
-}
-
-float inchesToMillimeters(float inches) {
-	return 25.4 * inches;
-}
-
-float feetToInches(float inches) {
-	return 12 * inches;
-}
-
-float feetToMillimeters(float feet) {
-	return inchesToMillimeters(feetToInches(feet));
-}
-
-float feetInchesToMillimeters(float feet, float inches) {
-	return inchesToMillimeters(feetToInches(feet) + inches);
-}
-
-void scale(ofMesh& mesh, float amount) {
-	for(int i = 0; i < mesh.getNumVertices(); i++) {
-		mesh.getVertices()[i] *= amount;
-	}
-}
+#include "Conversion.h"
 
 float stageSize = feetInchesToMillimeters(15, 8);
-float stageHeight = feetToMillimeters(16);
-float eyeLevel = feetInchesToMillimeters(5, 9);
-ofVec2f play3Orientation = ofVec2f(-1, 0);
-
-ofVboMesh Speaker::play3;
-int Speaker::count = 0;
-void Speaker::setupMesh() {
-	ofxAssimpModelLoader model;
-	model.loadModel("play3.obj");
-	play3 = model.getMesh(0);
-	scale(play3, centimetersToMillimeters(1));
-}
-
-ofVec3f referencePoint;
-bool distanceToReference(const ofVec3f& a, const ofVec3f& b) {
-	return a.distance(referencePoint) < b.distance(referencePoint);
-}
-
-float movingHysteresis = 1;
-float minHysteresis = 5;
-float stillHysteresis = 30;
-float backwardsHysteresis = 160;
-float curHysteresis;
-float stillWait = .99;
-float smoothRate = .1;
-float actualSmoothRate = .1;
-float maxSpeed = .01;
-
-void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
-	this->position = position;
-	label = ofToString(count++);
-	
-	vector<ofVec3f> centers = wiresCloud.getVertices();
-	referencePoint = position;
-	ofSort(centers, distanceToReference);
-	ofVec2f a = centers[0], b = centers[1], c = centers[2];
-	wires.addVertex(a);
-	wires.addVertex(b);
-	wires.addVertex(c);
-	// could also determine the real orientation from wires, but it's more work
-	orientation = -position;
-	orientation.normalize();
-	baseRotation = play3Orientation.angle(orientation);
-	
-	prevMoving = false;
-	moving = false;
-	prevAngle = 0;
-	currentAngle = 0;
-	smoothAngle = 0;
-	actualAngle = 0;
-}
-
-void Speaker::draw() {
-	ofPushMatrix();
-	wires.drawWireframe();
-	ofTranslate(position.x, position.y, 0);
-	ofDrawBitmapString(label, 0, 0);
-	ofTranslate(0, 0, position.z);
-	ofLine(ofVec2f(0, 0), orientation * feetToMillimeters(1));
-	ofPushMatrix();
-	ofRotateZ(baseRotation + actualAngle);
-	play3.draw();
-	ofPopMatrix();
-	ofPopMatrix();
-}
-
-ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
-	float minimum;
-	ofVec2f closest;
-	for(int i = 0; i < points.size(); i++) {
-		float cur = points[i].distance(target);
-		if(i == 0 || cur < minimum) {
-			minimum = cur;
-			closest = points[i];
-		}
-	}
-	return closest;
-}
-
-void Speaker::update(vector<ofVec2f>& listeners) {
-	ofVec2f closest = getClosestPoint(listeners, position);
-	ofVec2f actual = closest - position;
-	actualAngle = orientation.angle(actual);
-	/*
-	actual.rotate(baseRotation);
-	float realAngle = ofRadToDeg(atan2f(actual.y, actual.x));
-	if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
-		(prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {
-		currentAngle = prevAngle;
-	} else {
-		currentAngle = realAngle;
-	}
-	prevAngle = currentAngle;
-	
-	float nextAngle = ofLerp(smoothAngle, currentAngle, smoothRate);
-	smoothAngle += ofClamp(nextAngle - smoothAngle, -maxSpeed, maxSpeed);
-	
-	if(fabsf(currentAngle - actualAngle) > curHysteresis) {
-		actualAngle = ofLerp(actualAngle, smoothAngle, actualSmoothRate);
-		curHysteresis = movingHysteresis;
-		moving = true;
-	} else {
-		if(prevMoving) {
-			curHysteresis = stillHysteresis;
-		} else {
-			curHysteresis = MAX(minHysteresis, curHysteresis * stillWait);
-		}
-		moving = false;
-	}
-	prevMoving = moving;
-	*/ 
-}
+float stageHeight = feetToMillimeters(10);
+float eyeLevel = feetInchesToMillimeters(5, 8);
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofEnableAlphaBlending();
+	
+	driver.setup("tty", 9600);
+	driver.setDeadZone(10);
+	
+	font.loadFont("uni05_53.ttf", 6, false);
 	
 	Speaker::setupMesh();
 	
@@ -162,6 +42,8 @@ void ofApp::setup() {
 	
 	buildWires();
 	buildSpeakers();
+	
+	autorun = false;
 }
 
 void ofApp::buildWires() {
@@ -169,7 +51,7 @@ void ofApp::buildWires() {
 	for(int i = 0; i < wiresCloud.getNumVertices(); i++) {
 		ofVec3f wireCenter = wiresCloud.getVertex(i);
 		wires.addVertex(wireCenter);
-		wires.addVertex(wireCenter + ofVec3f(0, 0, feetToMillimeters(16)));
+		wires.addVertex(wireCenter + ofVec3f(0, 0, stageHeight));
 	}
 }
 
@@ -178,7 +60,7 @@ void ofApp::buildSpeakers() {
 	for(int i = 0; i < centersCloud.getNumVertices(); i++) {
 		Speaker speaker;
 		ofVec3f position = centersCloud.getVertex(i);
-		position.z = feetToMillimeters(ofRandom(2, 8));
+		position.z = feetToMillimeters(ofRandom(2, 6));
 		speaker.setup(position, wiresCloud);
 		speakers.push_back(speaker);
 	}
@@ -186,6 +68,13 @@ void ofApp::buildSpeakers() {
 
 void ofApp::update() {
 	listeners.clear();
+	if(autorun) {
+		ofVec2f planet;
+		float t = .05 * ofGetElapsedTimef();
+		planet.x = ofMap(ofNoise(t, 0), 0, 1, -stageSize, stageSize) / 2; 
+		planet.y = ofMap(ofNoise(0, t), 0, 1, -stageSize, stageSize) / 2;
+		listeners.push_back(planet);
+	}
 	if(ofGetKeyPressed('m')) {
 		listeners.push_back(ofVec2f(0, 0));
 	}
@@ -198,6 +87,12 @@ void ofApp::update() {
 	for(int i = 0; i < speakers.size(); i++) {
 		speakers[i].update(listeners);
 	}
+	
+	vector<float> angles;
+	for(int i = 0; i < speakers.size(); i++) {
+		angles.push_back(speakers[i].getAngle());
+	}
+	driver.update(angles);
 }
 
 void ofApp::draw() {
@@ -227,4 +122,17 @@ void ofApp::draw() {
 	centersCloud.draw();
 	wires.draw();
 	cam.end();
+	
+	vector<unsigned char>& packet = driver.getPacket();
+	string msg;
+	for(int i = 0; i < packet.size(); i++) {
+		msg += ofToString(i, 2, '0') + " 0x" + ofToHex(packet[i]) + "\n";
+	}
+	font.drawString(msg, 10, 10);
+}
+
+void ofApp::keyPressed(int key) {
+	if(key == 'a') {
+		autorun = !autorun;
+	}
 }
