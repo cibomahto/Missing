@@ -18,6 +18,7 @@ float perspectiveScale = .15;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
+	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofEnableAlphaBlending();
 	
 	driver.setup("tty", 9600);
@@ -26,12 +27,12 @@ void ofApp::setup() {
 	MiniFont::setup();
 	
 	midi.listPorts();
-	midi.openPort(0);
+	midi.openPort("IAC Driver Bus 1");
 	
 	osc.setup(145145);
 	
 	presence.setDelay(.5);
-	volume.setLength(1);
+	volume.setLength(3);
 	
 	Speaker::setupMesh();
 	
@@ -111,7 +112,7 @@ void ofApp::update() {
 	rawPresence = !listeners.empty();
 	presence.update(rawPresence);
 	volume.update(presence);
-	midi.sendControlChange(0, 0, 127 * volume.get());
+	midi.sendControlChange(1, 1, 127 * volume.get());
 	
 	for(int i = 0; i < speakers.size(); i++) {
 		speakers[i].update(listeners);
