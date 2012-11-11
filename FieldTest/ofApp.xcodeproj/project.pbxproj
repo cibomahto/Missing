@@ -19,6 +19,20 @@
 		278518AA16503AED000AF510 /* ofxMidiIn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2785189616503AED000AF510 /* ofxMidiIn.cpp */; };
 		278518AB16503AED000AF510 /* ofxMidiMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2785189816503AED000AF510 /* ofxMidiMessage.cpp */; };
 		278518AC16503AED000AF510 /* ofxMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2785189A16503AED000AF510 /* ofxMidiOut.cpp */; };
+		278518ED165046D2000AF510 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518C9165046D2000AF510 /* IpEndpointName.cpp */; };
+		278518EE165046D2000AF510 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518CE165046D2000AF510 /* NetworkingUtils.cpp */; };
+		278518EF165046D2000AF510 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518CF165046D2000AF510 /* UdpSocket.cpp */; };
+		278518F0165046D2000AF510 /* NetworkingUtilsWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518D3165046D2000AF510 /* NetworkingUtilsWin.cpp */; };
+		278518F1165046D2000AF510 /* UdpSocketWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518D4165046D2000AF510 /* UdpSocketWin.cpp */; };
+		278518F2165046D2000AF510 /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518D9165046D2000AF510 /* OscOutboundPacketStream.cpp */; };
+		278518F3165046D2000AF510 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518DC165046D2000AF510 /* OscPrintReceivedElements.cpp */; };
+		278518F4165046D2000AF510 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518DE165046D2000AF510 /* OscReceivedElements.cpp */; };
+		278518F5165046D2000AF510 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518E0165046D2000AF510 /* OscTypes.cpp */; };
+		278518F6165046D2000AF510 /* ofxOscBundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518E5165046D2000AF510 /* ofxOscBundle.cpp */; };
+		278518F7165046D2000AF510 /* ofxOscMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518E7165046D2000AF510 /* ofxOscMessage.cpp */; };
+		278518F8165046D2000AF510 /* ofxOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518E9165046D2000AF510 /* ofxOscReceiver.cpp */; };
+		278518F9165046D2000AF510 /* ofxOscSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278518EB165046D2000AF510 /* ofxOscSender.cpp */; };
+		2785199516505520000AF510 /* MiniFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2785199416505520000AF510 /* MiniFont.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworks.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworks.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -137,6 +151,40 @@
 		2785189A16503AED000AF510 /* ofxMidiOut.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxMidiOut.cpp; path = ../../../addons/ofxMidi/src/ofxMidiOut.cpp; sourceTree = SOURCE_ROOT; };
 		2785189B16503AED000AF510 /* ofxMidiOut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxMidiOut.h; path = ../../../addons/ofxMidi/src/ofxMidiOut.h; sourceTree = SOURCE_ROOT; };
 		2785189C16503AED000AF510 /* ofxMidiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxMidiTypes.h; path = ../../../addons/ofxMidi/src/ofxMidiTypes.h; sourceTree = SOURCE_ROOT; };
+		278518C9165046D2000AF510 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IpEndpointName.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.cpp; sourceTree = SOURCE_ROOT; };
+		278518CA165046D2000AF510 /* IpEndpointName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IpEndpointName.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/IpEndpointName.h; sourceTree = SOURCE_ROOT; };
+		278518CB165046D2000AF510 /* NetworkingUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NetworkingUtils.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/NetworkingUtils.h; sourceTree = SOURCE_ROOT; };
+		278518CC165046D2000AF510 /* PacketListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/PacketListener.h; sourceTree = SOURCE_ROOT; };
+		278518CE165046D2000AF510 /* NetworkingUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NetworkingUtils.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/posix/NetworkingUtils.cpp; sourceTree = SOURCE_ROOT; };
+		278518CF165046D2000AF510 /* UdpSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UdpSocket.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/posix/UdpSocket.cpp; sourceTree = SOURCE_ROOT; };
+		278518D0165046D2000AF510 /* TimerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TimerListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/TimerListener.h; sourceTree = SOURCE_ROOT; };
+		278518D1165046D2000AF510 /* UdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UdpSocket.h; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/UdpSocket.h; sourceTree = SOURCE_ROOT; };
+		278518D3165046D2000AF510 /* NetworkingUtilsWin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = NetworkingUtilsWin.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/win32/NetworkingUtilsWin.cpp; sourceTree = SOURCE_ROOT; };
+		278518D4165046D2000AF510 /* UdpSocketWin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UdpSocketWin.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/ip/win32/UdpSocketWin.cpp; sourceTree = SOURCE_ROOT; };
+		278518D6165046D2000AF510 /* MessageMappingOscPacketListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MessageMappingOscPacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/MessageMappingOscPacketListener.h; sourceTree = SOURCE_ROOT; };
+		278518D7165046D2000AF510 /* OscException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscException.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscException.h; sourceTree = SOURCE_ROOT; };
+		278518D8165046D2000AF510 /* OscHostEndianness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscHostEndianness.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscHostEndianness.h; sourceTree = SOURCE_ROOT; };
+		278518D9165046D2000AF510 /* OscOutboundPacketStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OscOutboundPacketStream.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.cpp; sourceTree = SOURCE_ROOT; };
+		278518DA165046D2000AF510 /* OscOutboundPacketStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscOutboundPacketStream.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscOutboundPacketStream.h; sourceTree = SOURCE_ROOT; };
+		278518DB165046D2000AF510 /* OscPacketListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscPacketListener.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPacketListener.h; sourceTree = SOURCE_ROOT; };
+		278518DC165046D2000AF510 /* OscPrintReceivedElements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OscPrintReceivedElements.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.cpp; sourceTree = SOURCE_ROOT; };
+		278518DD165046D2000AF510 /* OscPrintReceivedElements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscPrintReceivedElements.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscPrintReceivedElements.h; sourceTree = SOURCE_ROOT; };
+		278518DE165046D2000AF510 /* OscReceivedElements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OscReceivedElements.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.cpp; sourceTree = SOURCE_ROOT; };
+		278518DF165046D2000AF510 /* OscReceivedElements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscReceivedElements.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscReceivedElements.h; sourceTree = SOURCE_ROOT; };
+		278518E0165046D2000AF510 /* OscTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OscTypes.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp; sourceTree = SOURCE_ROOT; };
+		278518E1165046D2000AF510 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OscTypes.h; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.h; sourceTree = SOURCE_ROOT; };
+		278518E3165046D2000AF510 /* ofxOsc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOsc.h; path = ../../../addons/ofxOsc/src/ofxOsc.h; sourceTree = SOURCE_ROOT; };
+		278518E4165046D2000AF510 /* ofxOscArg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOscArg.h; path = ../../../addons/ofxOsc/src/ofxOscArg.h; sourceTree = SOURCE_ROOT; };
+		278518E5165046D2000AF510 /* ofxOscBundle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxOscBundle.cpp; path = ../../../addons/ofxOsc/src/ofxOscBundle.cpp; sourceTree = SOURCE_ROOT; };
+		278518E6165046D2000AF510 /* ofxOscBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOscBundle.h; path = ../../../addons/ofxOsc/src/ofxOscBundle.h; sourceTree = SOURCE_ROOT; };
+		278518E7165046D2000AF510 /* ofxOscMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxOscMessage.cpp; path = ../../../addons/ofxOsc/src/ofxOscMessage.cpp; sourceTree = SOURCE_ROOT; };
+		278518E8165046D2000AF510 /* ofxOscMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOscMessage.h; path = ../../../addons/ofxOsc/src/ofxOscMessage.h; sourceTree = SOURCE_ROOT; };
+		278518E9165046D2000AF510 /* ofxOscReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxOscReceiver.cpp; path = ../../../addons/ofxOsc/src/ofxOscReceiver.cpp; sourceTree = SOURCE_ROOT; };
+		278518EA165046D2000AF510 /* ofxOscReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOscReceiver.h; path = ../../../addons/ofxOsc/src/ofxOscReceiver.h; sourceTree = SOURCE_ROOT; };
+		278518EB165046D2000AF510 /* ofxOscSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxOscSender.cpp; path = ../../../addons/ofxOsc/src/ofxOscSender.cpp; sourceTree = SOURCE_ROOT; };
+		278518EC165046D2000AF510 /* ofxOscSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxOscSender.h; path = ../../../addons/ofxOsc/src/ofxOscSender.h; sourceTree = SOURCE_ROOT; };
+		2785197B16505383000AF510 /* MiniFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MiniFont.h; path = src/MiniFont.h; sourceTree = SOURCE_ROOT; };
+		2785199416505520000AF510 /* MiniFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MiniFont.cpp; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		C1DA593B164EF14400B4F2CF /* DriverInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DriverInterface.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -349,9 +397,122 @@
 			path = ../../../addons/ofxMidi/src/desktop/rtmidi;
 			sourceTree = SOURCE_ROOT;
 		};
+		278518C3165046D2000AF510 /* ofxOsc */ = {
+			isa = PBXGroup;
+			children = (
+				278518C5165046D2000AF510 /* libs */,
+				278518E2165046D2000AF510 /* src */,
+			);
+			name = ofxOsc;
+			path = ../../../addons/ofxOsc;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518C5165046D2000AF510 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				278518C6165046D2000AF510 /* oscpack */,
+			);
+			name = libs;
+			path = ../../../addons/ofxOsc/libs;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518C6165046D2000AF510 /* oscpack */ = {
+			isa = PBXGroup;
+			children = (
+				278518C7165046D2000AF510 /* src */,
+			);
+			name = oscpack;
+			path = ../../../addons/ofxOsc/libs/oscpack;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518C7165046D2000AF510 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				278518C8165046D2000AF510 /* ip */,
+				278518D5165046D2000AF510 /* osc */,
+			);
+			name = src;
+			path = ../../../addons/ofxOsc/libs/oscpack/src;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518C8165046D2000AF510 /* ip */ = {
+			isa = PBXGroup;
+			children = (
+				278518C9165046D2000AF510 /* IpEndpointName.cpp */,
+				278518CA165046D2000AF510 /* IpEndpointName.h */,
+				278518CB165046D2000AF510 /* NetworkingUtils.h */,
+				278518CC165046D2000AF510 /* PacketListener.h */,
+				278518CD165046D2000AF510 /* posix */,
+				278518D0165046D2000AF510 /* TimerListener.h */,
+				278518D1165046D2000AF510 /* UdpSocket.h */,
+				278518D2165046D2000AF510 /* win32 */,
+			);
+			name = ip;
+			path = ../../../addons/ofxOsc/libs/oscpack/src/ip;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518CD165046D2000AF510 /* posix */ = {
+			isa = PBXGroup;
+			children = (
+				278518CE165046D2000AF510 /* NetworkingUtils.cpp */,
+				278518CF165046D2000AF510 /* UdpSocket.cpp */,
+			);
+			name = posix;
+			path = ../../../addons/ofxOsc/libs/oscpack/src/ip/posix;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518D2165046D2000AF510 /* win32 */ = {
+			isa = PBXGroup;
+			children = (
+				278518D3165046D2000AF510 /* NetworkingUtilsWin.cpp */,
+				278518D4165046D2000AF510 /* UdpSocketWin.cpp */,
+			);
+			name = win32;
+			path = ../../../addons/ofxOsc/libs/oscpack/src/ip/win32;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518D5165046D2000AF510 /* osc */ = {
+			isa = PBXGroup;
+			children = (
+				278518D6165046D2000AF510 /* MessageMappingOscPacketListener.h */,
+				278518D7165046D2000AF510 /* OscException.h */,
+				278518D8165046D2000AF510 /* OscHostEndianness.h */,
+				278518D9165046D2000AF510 /* OscOutboundPacketStream.cpp */,
+				278518DA165046D2000AF510 /* OscOutboundPacketStream.h */,
+				278518DB165046D2000AF510 /* OscPacketListener.h */,
+				278518DC165046D2000AF510 /* OscPrintReceivedElements.cpp */,
+				278518DD165046D2000AF510 /* OscPrintReceivedElements.h */,
+				278518DE165046D2000AF510 /* OscReceivedElements.cpp */,
+				278518DF165046D2000AF510 /* OscReceivedElements.h */,
+				278518E0165046D2000AF510 /* OscTypes.cpp */,
+				278518E1165046D2000AF510 /* OscTypes.h */,
+			);
+			name = osc;
+			path = ../../../addons/ofxOsc/libs/oscpack/src/osc;
+			sourceTree = SOURCE_ROOT;
+		};
+		278518E2165046D2000AF510 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				278518E3165046D2000AF510 /* ofxOsc.h */,
+				278518E4165046D2000AF510 /* ofxOscArg.h */,
+				278518E5165046D2000AF510 /* ofxOscBundle.cpp */,
+				278518E6165046D2000AF510 /* ofxOscBundle.h */,
+				278518E7165046D2000AF510 /* ofxOscMessage.cpp */,
+				278518E8165046D2000AF510 /* ofxOscMessage.h */,
+				278518E9165046D2000AF510 /* ofxOscReceiver.cpp */,
+				278518EA165046D2000AF510 /* ofxOscReceiver.h */,
+				278518EB165046D2000AF510 /* ofxOscSender.cpp */,
+				278518EC165046D2000AF510 /* ofxOscSender.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxOsc/src;
+			sourceTree = SOURCE_ROOT;
+		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				278518C3165046D2000AF510 /* ofxOsc */,
 				2785186E16503ADE000AF510 /* ofxMidi */,
 				278518051650314E000AF510 /* ofxTiming */,
 				272BD51D164CFA270047E7EB /* ofxAssimpModelLoader */,
@@ -423,6 +584,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				2785199416505520000AF510 /* MiniFont.cpp */,
+				2785197B16505383000AF510 /* MiniFont.h */,
 				27851542164F4376000AF510 /* Conversion.h */,
 				2785153F164F4286000AF510 /* Speaker.cpp */,
 				27851540164F4286000AF510 /* Speaker.h */,
@@ -538,6 +701,20 @@
 				278518AA16503AED000AF510 /* ofxMidiIn.cpp in Sources */,
 				278518AB16503AED000AF510 /* ofxMidiMessage.cpp in Sources */,
 				278518AC16503AED000AF510 /* ofxMidiOut.cpp in Sources */,
+				278518ED165046D2000AF510 /* IpEndpointName.cpp in Sources */,
+				278518EE165046D2000AF510 /* NetworkingUtils.cpp in Sources */,
+				278518EF165046D2000AF510 /* UdpSocket.cpp in Sources */,
+				278518F0165046D2000AF510 /* NetworkingUtilsWin.cpp in Sources */,
+				278518F1165046D2000AF510 /* UdpSocketWin.cpp in Sources */,
+				278518F2165046D2000AF510 /* OscOutboundPacketStream.cpp in Sources */,
+				278518F3165046D2000AF510 /* OscPrintReceivedElements.cpp in Sources */,
+				278518F4165046D2000AF510 /* OscReceivedElements.cpp in Sources */,
+				278518F5165046D2000AF510 /* OscTypes.cpp in Sources */,
+				278518F6165046D2000AF510 /* ofxOscBundle.cpp in Sources */,
+				278518F7165046D2000AF510 /* ofxOscMessage.cpp in Sources */,
+				278518F8165046D2000AF510 /* ofxOscReceiver.cpp in Sources */,
+				278518F9165046D2000AF510 /* ofxOscSender.cpp in Sources */,
+				2785199516505520000AF510 /* MiniFont.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -574,6 +751,15 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
+					src,
+					../../../addons/ofxOsc/libs,
+					../../../addons/ofxOsc/libs/oscpack,
+					../../../addons/ofxOsc/libs/oscpack/src,
+					../../../addons/ofxOsc/libs/oscpack/src/ip,
+					../../../addons/ofxOsc/libs/oscpack/src/ip/posix,
+					../../../addons/ofxOsc/libs/oscpack/src/ip/win32,
+					../../../addons/ofxOsc/libs/oscpack/src/osc,
+					../../../addons/ofxOsc/src,
 					../../../addons/ofxAssimpModelLoader/libs,
 					../../../addons/ofxAssimpModelLoader/libs/assimp,
 					../../../addons/ofxAssimpModelLoader/libs/assimp/include,
@@ -618,6 +804,15 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
+					src,
+					../../../addons/ofxOsc/libs,
+					../../../addons/ofxOsc/libs/oscpack,
+					../../../addons/ofxOsc/libs/oscpack/src,
+					../../../addons/ofxOsc/libs/oscpack/src/ip,
+					../../../addons/ofxOsc/libs/oscpack/src/ip/posix,
+					../../../addons/ofxOsc/libs/oscpack/src/ip/win32,
+					../../../addons/ofxOsc/libs/oscpack/src/osc,
+					../../../addons/ofxOsc/src,
 					../../../addons/ofxAssimpModelLoader/libs,
 					../../../addons/ofxAssimpModelLoader/libs/assimp,
 					../../../addons/ofxAssimpModelLoader/libs/assimp/include,
