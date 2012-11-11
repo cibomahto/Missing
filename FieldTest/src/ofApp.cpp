@@ -3,14 +3,8 @@
  +z is up, -z is down
  everything on screen is done in millimeters, though data is diverse
 
- need to test with actual serial device
- x generate random walks/noise
- x handle the case where the path goes around the back
- x separate code into more files
- x show simulated speaker motion
- add crc
  render from multiple perspectives
- x more debug info
+ need to test with actual serial device
  */
 
 #include "ofApp.h"

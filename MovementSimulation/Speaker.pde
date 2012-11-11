@@ -42,9 +42,9 @@ class Speaker {
   }
   
   void update() {
-    PVector actual = new PVector(my - y, mx - x);
+    PVector actual = new PVector(mx - x, my - y);
     actual.rotate(orientation);
-    float realAngle = atan2(actual.x, actual.y);
+    float realAngle = atan2(actual.y, actual.x);
     if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
       (prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {
       currentAngle = prevAngle;
