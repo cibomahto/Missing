@@ -5,8 +5,6 @@
 
  need to test with actual serial device
  autorotate
- send midi to ableton
- receive osc describing people's positions
  */
 
 #include "ofApp.h"
@@ -28,6 +26,8 @@ void ofApp::setup() {
 	
 	midi.listPorts();
 	midi.openPort(0);
+	
+	osc.setup(145145);
 	
 	presence.setDelay(.5);
 	volume.setLength(1);
@@ -72,7 +72,23 @@ void ofApp::buildSpeakers() {
 }
 
 void ofApp::update() {
-	listeners.clear();
+	while(osc.hasWaitingMessages()) {
+		ofxOscMessage msg;
+		osc.getNextMessage(&msg);
+		string address = msg.getAddress();
+		if(address == "/listeners") {
+			int n = msg.getNumArgs() / 2;
+			oscListeners.clear();
+			for(int i = 0; i < n; i++) {
+				ofVec2f cur(msg.getArgAsFloat(2 * i), msg.getArgAsFloat(2 * i + 1));
+				oscListeners.push_back(cur);
+			}
+		}
+	}
+
+	// start by copying the current osc listeners
+	listeners = oscListeners;
+	// then add any autorun listeners
 	if(autorun) {
 		ofVec2f planet;
 		float t = .05 * ofGetElapsedTimef();
@@ -80,13 +96,15 @@ void ofApp::update() {
 		planet.y = ofMap(ofNoise(0, t), 0, 1, -stageSize, stageSize) / 2;
 		listeners.push_back(planet);
 	}
+	// a center listener if 'm' is pressed
 	if(ofGetKeyPressed('m')) {
 		listeners.push_back(ofVec2f(0, 0));
 	}
+	// a mouse-following listener if ' ' is pressed
 	if(ofGetKeyPressed(' ')) {
 		listeners.push_back(ofVec2f(
-			ofMap(mouseX, 0, ofGetWidth(), -stageSize / 2, stageSize / 2),
-			ofMap(mouseY, 0, ofGetHeight(), stageSize / 2, -stageSize / 2)));
+			ofMap(mouseY, 0, ofGetHeight(), -stageSize / 2, stageSize / 2),
+			ofMap(mouseX, 0, ofGetWidth(), stageSize / 2, -stageSize / 2)));
 	}
 	
 	rawPresence = !listeners.empty();

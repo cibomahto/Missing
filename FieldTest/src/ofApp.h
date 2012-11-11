@@ -5,6 +5,7 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxMidi.h"
 #include "ofxTiming.h"
+#include "ofxOsc.h"
 
 #include "DriverInterface.h"
 #include "Speaker.h"
@@ -30,12 +31,13 @@ public:
 	ofVboMesh wires;
 	
 	vector<Speaker> speakers;
-	vector<ofVec2f> listeners;
+	vector<ofVec2f> listeners, oscListeners;
 	
 	DriverInterface driver;
 	ofTrueTypeFont font;
 	
 	ofxMidiOut midi;
+	ofxOscReceiver osc;
 	
 	bool rawPresence;
 	Hysteresis presence;
