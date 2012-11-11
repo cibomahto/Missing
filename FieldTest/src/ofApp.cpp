@@ -3,7 +3,6 @@
  +z is up, -z is down
  everything on screen is done in millimeters, though data is diverse
 
- render from multiple perspectives
  need to test with actual serial device
  */
 
@@ -89,13 +88,7 @@ void ofApp::update() {
 	driver.update(angles);
 }
 
-void ofApp::draw() {
-	ofBackground(0);
-	ofSetColor(255, 128);
-	
-	cam.begin();
-	ofScale(.2, .2, .2);
-	
+void ofApp::drawScene(bool showLabels) {
 	ofTranslate(0, 0, -eyeLevel);
 	ofPushMatrix();
 	ofNoFill();
@@ -105,7 +98,7 @@ void ofApp::draw() {
 	ofPopMatrix();
 	
 	for(int i = 0; i < speakers.size(); i++) {
-		speakers[i].draw();
+		speakers[i].draw(showLabels);
 	}
 	
 	for(int i = 0; i < listeners.size(); i++) {
@@ -115,7 +108,55 @@ void ofApp::draw() {
 	wiresCloud.draw();
 	centersCloud.draw();
 	wires.draw();
+}
+
+void ofApp::drawPlan(float x, float y, float side) {
+	ofPushView();
+	ofViewport(x, y, side, side);
+	ofPushStyle();
+	ofFill();
+	ofSetColor(0);
+	ofRect(0, 0, side, side);
+	ofPopStyle();
+	ofSetupScreenOrtho(side, side, OF_ORIENTATION_DEFAULT, false, -stageHeight, stageHeight);
+	ofTranslate(side / 2, side / 2);
+	float scale = side / stageSize;
+	ofScale(scale, scale, scale);
+	drawScene(false);
+	ofPopView();
+}
+
+void ofApp::drawSection(float x, float y, float side) {
+	ofPushView();
+	ofViewport(x, y, side, side);
+	ofPushStyle();
+	ofFill();
+	ofSetColor(0);
+	ofRect(0, 0, side, side);
+	ofPopStyle();
+	ofSetupScreenOrtho(side, side, OF_ORIENTATION_DEFAULT, false, -stageHeight, stageHeight);
+	ofTranslate(side / 2, side / 2);
+	ofRotateX(-90);
+	float scale = side / stageSize;
+	ofScale(scale, scale, scale);
+	drawScene(false);
+	ofPopView();
+}
+
+void ofApp::drawPerspective() {
+	cam.begin();
+	ofScale(.2, .2, .2);
+	drawScene(true);
 	cam.end();
+}
+
+void ofApp::draw() {
+	ofBackground(0);
+	ofSetColor(255, 128);
+	
+	drawPerspective();
+	drawPlan(ofGetWidth() - 256, 0, 256);
+	drawSection(ofGetWidth() - 256, 256, 256);
 	
 	vector<unsigned char>& packet = driver.getPacket();
 	string msg;

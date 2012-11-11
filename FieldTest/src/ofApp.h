@@ -13,13 +13,18 @@ public:
 	void draw();
 	void keyPressed(int key);
 	
+	void drawScene(bool showLabels);
+	void drawPlan(float x, float y, float side);
+	void drawSection(float x, float y, float side);
+	void drawPerspective();
+	
 	void buildWires();
 	void buildSpeakers();
 	
 	bool autorun;
 	ofEasyCam cam;
-	ofMesh wiresCloud, centersCloud;
-	ofMesh wires;
+	ofVboMesh wiresCloud, centersCloud;
+	ofVboMesh wires;
 	
 	vector<Speaker> speakers;
 	vector<ofVec2f> listeners;

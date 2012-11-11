@@ -19,7 +19,7 @@ protected:
 public:
 	static void setupMesh();
 	void setup(ofVec3f position, ofMesh& wires);
-	void draw();
+	void draw(bool showLabel);
 	void update(vector<ofVec2f>& listeners);
 	float getAngle();
 };

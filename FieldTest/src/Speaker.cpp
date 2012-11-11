@@ -65,7 +65,7 @@ void drawAngle(float angle, ofColor color) {
 	ofPopMatrix();
 }
 
-void Speaker::draw() {
+void Speaker::draw(bool showLabel) {
 	ofPushMatrix();
 	ofTranslate(0, 0, position.z + mountOffset);
 	wires.drawWireframe();
@@ -75,7 +75,9 @@ void Speaker::draw() {
 	ofTranslate(position.x, position.y);
 	ofPushStyle();
 	ofSetColor(255);
-	ofDrawBitmapString(label, 0, 0);
+	if(showLabel) {
+		ofDrawBitmapString(label, 0, 0);
+	}
 	ofPopStyle();
 	ofTranslate(0, 0, position.z);
 	ofRotateZ(baseRotation);
