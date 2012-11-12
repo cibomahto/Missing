@@ -3,11 +3,15 @@
 using namespace ofxCv;
 using namespace cv;
 
+const float stageSize = feetInchesToMillimeters(15, 8);
+
 void ofApp::setup() {
 	ofSetVerticalSync(true);
 	kinect.init(false, false);
 	kinect.setRegistration(false);
 	kinect.open();
+	
+	osc.setup("sonoss-Mac-mini.local", 145145);
 	
 	gui.setup(280, 800);
 	gui.addPanel("Grid");
@@ -17,7 +21,6 @@ void ofApp::setup() {
 	gui.addToggle("showGrid", true);
 	gui.addSlider("zoom", .16, 0, 1);
 	gui.addSlider("gridDivisions", 64, 1, 128, true);
-	gui.addSlider("gridScale", 2500, 0, 4000);
 	gui.addSlider("gridOffsetX", 0, -4000, 4000);
 	gui.addSlider("gridOffsetY", 1500, -4000, 4000);
 	gui.addSlider("presenceScale", 100, 1, 500);
@@ -92,7 +95,6 @@ void ofApp::update() {
 		quat.get(mat);
 		
 		int gridDivisions = gui.getValueF("gridDivisions");
-		float gridScale = gui.getValueF("gridScale");
 		presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
 		int presenceArea = gridDivisions * gridDivisions;
 		for(int i = 0; i < presenceArea; i++) {
@@ -122,8 +124,8 @@ void ofApp::update() {
 					ofVec2f flat = mat * cur;
 					flat += gridOffset;
 					foregroundFlat.addVertex(flat);
-					flat.x = (int) ofMap(flat.x, -gridScale, +gridScale, 0, gridDivisions, true);
-					flat.y = (int) ofMap(flat.y, -gridScale, +gridScale, 0, gridDivisions, true);
+					flat.x = (int) ofMap(flat.x, -stageSize / 2, +stageSize / 2, 0, gridDivisions, true);
+					flat.y = (int) ofMap(flat.y, -stageSize / 2, +stageSize / 2, 0, gridDivisions, true);
 					int i  = flat.y * gridDivisions + flat.x;
 					if(presence.getPixels()[i] < 1) {
 						presence.getPixels()[i] += presenceScale;
@@ -144,6 +146,15 @@ void ofApp::update() {
 		ofPixels presenceBytes;
 		ofxCv::copy(presence, presenceBytes);
 		contourFinder.findContours(presenceBytes);
+		
+		ofxOscMessage msg;
+		msg.setAddress("/listeners");
+		for(int i = 0; i < contourFinder.size(); i++) {
+			ofVec2f cur = toOf(contourFinder.getCentroid(i));
+			msg.addFloatArg(ofMap(cur.x, 0, gridDivisions, -stageSize / 2, +stageSize / 2));
+			msg.addFloatArg(ofMap(cur.y, 0, gridDivisions, -stageSize / 2, +stageSize / 2));
+		}
+		osc.sendMessage(msg);
 	}
 }
 
@@ -168,29 +179,26 @@ void ofApp::draw() {
 		ofPushMatrix();
 		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
 		float zoom = gui.getValueF("zoom");
-		float gridScale = gui.getValueF("gridScale");
 		int gridDivisions = gui.getValueF("gridDivisions");
 		ofScale(zoom, zoom);
 		
 		ofPushMatrix();
-		float gridZoom = 2 * gridScale / gridDivisions;
+		float gridZoom = stageSize / gridDivisions;
 		ofScale(gridZoom, gridZoom);
 		ofTranslate(-gridDivisions / 2, -gridDivisions / 2);
 		presence.bind();
 		ofSetMinMagFilters(GL_NEAREST, GL_NEAREST);
 		presence.unbind();
 		presence.draw(0, 0);
+		ofPushMatrix();
+		ofPushStyle();
+		ofTranslate(.5, .5);
+		ofSetColor(magentaPrint);
 		for(int i = 0; i < contourFinder.size(); i++) {
 			contourFinder.getPolyline(i).draw();
 		}
+		ofPopStyle();
 		ofPopMatrix();
-		
-		//ofDrawGrid(gridScale, gridDivisions, false, false, false, true);
-		
-		ofPushMatrix();
-		ofSetColor(32);
-		ofRotateY(90);
-		//ofDrawGridPlane(gridScale, gridDivisions / 2, false);
 		ofPopMatrix();
 		
 		ofSetColor(255);

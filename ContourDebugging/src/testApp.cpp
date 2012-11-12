@@ -20,6 +20,7 @@ void testApp::draw() {
 	ofSetMinMagFilters(GL_NEAREST, GL_NEAREST);
 	img.draw(0, 0);
 	img.unbind();
+	ofTranslate(.5, .5);
 	ofSetColor(255, 0, 0);
 	ofNoFill();
 	for(int i = 0; i < allContours.size(); i++) {
@@ -27,6 +28,6 @@ void testApp::draw() {
 		for(int j = 0; j < allContours[i].size(); j++) {
 			ofVertex(allContours[i][j].x, allContours[i][j].y);
 		}
-		ofEndShape();
+		ofEndShape(true);
 	}
 }
