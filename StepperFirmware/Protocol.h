@@ -7,8 +7,9 @@
 #define MAX_PACKETLENGTH    MAX_ADDRESS + 3
 
 #define MODE_NOPACKET       0x0      ///< Waiting for a high bit to start a packet
-#define MODE_UPDATETARGET   0xFE     ///< Receibing an UpdateTarget packet
-
+#define MODE_SETADDRESS     0x81     ///< Broadcast: Set the address for any attached device (payload length: 1)
+#define MODE_SETREVERSED    0x82     ///< Set the direction for the speficied device (payload length: 2, address, reversed)
+#define MODE_UPDATETARGET   0xFE     ///< Receiving an UpdateTarget packet                   (payload length: MAX_ADDRESS)
 
 class Protocol {
 private:

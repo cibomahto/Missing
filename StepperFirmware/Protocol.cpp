@@ -1,5 +1,6 @@
 #include "Protocol.h"
 #include "defines.h"
+#include "parameters.h"
 
 #define MIN_POSITION 100
 #define MAX_POSITION 1000
@@ -17,8 +18,6 @@ void Protocol::reset() {
   m_crc = 0;
   m_packetLength = 0;
   m_mode = MODE_NOPACKET;
-  
-  digitalWrite(LED_PIN, LOW);  // LED on
 }
 
 void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
@@ -27,7 +26,6 @@ void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
     switch(data) {
       case MODE_UPDATETARGET:
         reset();
-        digitalWrite(LED_PIN, HIGH);  // LED on
         
         m_mode = MODE_UPDATETARGET;
         m_expectedLength = MAX_ADDRESS + 3;
@@ -35,8 +33,27 @@ void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
         m_packetLength +=1;
         updateCRC(data);
         break;
-      default:
+        
+      case MODE_SETADDRESS:
         reset();
+        m_mode = MODE_SETADDRESS;
+        m_expectedLength = 1 + 3;
+        m_packetData[m_packetLength] = data;
+        m_packetLength +=1;
+        updateCRC(data);
+        break;
+        
+      case MODE_SETREVERSED:
+        reset();
+        m_mode = MODE_SETREVERSED;
+        m_expectedLength = 2 + 3;
+        m_packetData[m_packetLength] = data;
+        m_packetLength +=1;
+        updateCRC(data);
+        break;
+        
+      default:
+        reset(); 
         break;
     }
   }
@@ -57,8 +74,18 @@ void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
       
       switch(m_mode) {
         case MODE_UPDATETARGET:
-        
-          targetPosition = map(m_packetData[m_address], 0, 127, MIN_POSITION, MAX_POSITION);
+          targetPosition = map(m_packetData[m_address+1], 0, 127, MIN_POSITION, MAX_POSITION);
+          break;
+          
+        case MODE_SETADDRESS:
+          writeUint8Parameter(PARAMETER_ADDRESS, m_packetData[1]);
+          m_address = m_packetData[1];
+          break;
+          
+        case MODE_SETREVERSED:
+          if(m_packetData[1] == m_address) {
+            writeUint8Parameter(PARAMETER_REVERSED, m_packetData[2]==1);
+          }
           break;
       }
       

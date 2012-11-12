@@ -2,6 +2,9 @@
 #include "PololuStepper.h"
 #include "RS485.h"
 #include "Protocol.h"
+#include "parameters.h"
+
+#include <EEPROM.h>
 
 const uint8_t movingCurrent        = 35;
 const uint8_t decelerationCurrent  = 35;
@@ -38,20 +41,19 @@ Protocol protocol;
 uint8_t noise[NOISE_LENGTH];
 uint8_t noisePhase;
 
-
-#define DEVICE_ADDRESS 2
-
 void setup() {
   // Turn on the LED
   pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, HIGH);
+  digitalWrite(LED_PIN, LOW);
+  
+  initParameter();
 
   rs485.init(57600, MODE_RECEIVE);
   
-  protocol.init(DEVICE_ADDRESS);
-   
+  protocol.init(readUint8Parameter(PARAMETER_ADDRESS));
+  
   // Disable the stepper driver, configure it, then turn it back on.
-  stepper.init(SIXTEENTH_STEP, holdingCurrent, true);
+  stepper.init(SIXTEENTH_STEP, holdingCurrent, readUint8Parameter(PARAMETER_REVERSED));
 
   currentStepDelay = maxStepDelay;
   currentStepPosition = 0;
