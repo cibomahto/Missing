@@ -1,11 +1,8 @@
 /*
-x do blob detection and tracking
-x export data over osc
-* add final stage for rotating data
-* farther data has fewer points (use triangles area: |ABxAC|/2)
 * mask noisy areas around edges
 * use an iir filter on depth image
 * add second kinect
+* tune
 */
 
 #pragma once
@@ -29,7 +26,7 @@ public:
 	bool calibrating, clearBackground;
 	float calibrationStart;
 	
-	ofImage result, background;
+	ofImage valid, background;
 	
 	ofFloatImage presence;
 	ofMesh foregroundFlat;
