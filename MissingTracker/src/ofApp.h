@@ -1,17 +1,11 @@
 /*
-build up a background image (use nearest filtering over time)
-do that in the depth-image space
-analyze current image for any points that are > certain distance from background image
-project these points
-rotate+translate these points so they are oriented on the platform xy plane
-build up a low-resolution (binned) "presence graph"
--
-do blob detection and tracking
-* add final translation stage for centering data
-* add auto-rotation stage based on plane extraction
+x do blob detection and tracking
+x export data over osc
+* add final stage for rotating data
 * farther data has fewer points (use triangles area: |ABxAC|/2)
 * mask noisy areas around edges
 * use an iir filter on depth image
+* add second kinect
 */
 
 #pragma once
@@ -19,6 +13,9 @@ do blob detection and tracking
 #include "ofMain.h"
 #include "ofxKinect.h"
 #include "ofxAutoControlPanel.h"
+#include "ofxCv.h"
+#include "Conversion.h"
+#include "ofxOsc.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -38,4 +35,8 @@ public:
 	ofMesh foregroundFlat;
 	ofMesh foregroundCloud;
 	ofEasyCam cam;
+	
+	ofxCv::ContourFinder contourFinder;
+	
+	ofxOscSender osc;
 };

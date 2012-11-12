@@ -61,13 +61,10 @@ void ofApp::buildWires() {
 
 void ofApp::buildSpeakers() {
 	ofSeedRandom(0);
-	ofFile out;
-	out.open("out.csv");
 	for(int i = 0; i < centersCloud.getNumVertices(); i++) {
 		Speaker speaker;
 		ofVec3f position = centersCloud.getVertex(i);
 		position.z = feetToMillimeters(ofRandom(2, 6));
-		out << position.z << endl;
 		speaker.setup(position, wiresCloud);
 		speakers.push_back(speaker);
 	}
