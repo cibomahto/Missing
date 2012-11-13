@@ -1,6 +1,6 @@
 /*
 * add second kinect
-* tune
+* tune/calibrate
 */
 
 #pragma once
@@ -20,20 +20,21 @@ public:
 	void draw();
 	void exit();
 	
-	ofxKinect kinect;
 	ofxAutoControlPanel gui;
+	
 	bool calibrating, clearBackground;
 	float calibrationStart;
 	
+	// each kinect
+	ofxKinect kinect;
 	ofImage valid, background;
-	
-	ofFloatImage presence;
-	ofMesh foregroundFlat, foregroundCloud;
-	ofEasyCam cam;
-	
 	KinectFilter filter;
 	
+	// combined
+	ofMesh foregroundCloud, foregroundFlat;
+	ofFloatImage presence;	
 	ofxCv::ContourFinder contourFinder;
-	
 	ofxOscSender osc;
+	
+	ofEasyCam cam;
 };

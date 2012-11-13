@@ -17,6 +17,8 @@ void ofApp::setup() {
 	
 	gui.setup(280, 800);
 	gui.addPanel("Grid");
+	gui.addToggle("showCloud");
+	gui.addToggle("showFlatCloud");
 	gui.addSlider("minArea", 0, 0, 10);
 	gui.addSlider("maxArea", 40, 0, 40);
 	gui.addSlider("contourThreshold", 5, 0, 64);
@@ -111,7 +113,6 @@ void ofApp::update() {
 		}
 		
 		int threshold = gui.getValueI("threshold");
-		const unsigned short* rawDepthPixels = kinect.getRawDepthPixels();
 		for(int i = 0; i < n; i++) {
 			int kinectPixel = kinectPixels[i];
 			int backgroundPixel = backgroundPixels[i];
@@ -132,6 +133,7 @@ void ofApp::update() {
 		ofVec2f gridOffset(gui.getValueF("gridOffsetX"), gui.getValueF("gridOffsetY"));
 		float rotation = gui.getValueF("rotation");
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
+		const unsigned short* rawDepthPixels = kinect.getRawDepthPixels();
 		int i = 0;
 		for(int y = 0; y < height; y++) {
 			for(int x = 0; x < width; x++) {
@@ -221,14 +223,18 @@ void ofApp::draw() {
 		ofPopMatrix();
 		ofPopMatrix();
 		
-		ofSetColor(255);
-		//drawChunkyCloud(foregroundFlat);
+		if(gui.getValueB("showFlatCloud")) {
+			ofSetColor(255);
+			drawChunkyCloud(foregroundFlat);
+		}
 		ofPopMatrix();
 	}
-/*
-	cam.begin();
-	drawChunkyCloud(foregroundCloud);
-	cam.end();*/
+	
+	if(gui.getValueB("showCloud")) {
+		cam.begin();
+		drawChunkyCloud(foregroundCloud);
+		cam.end();
+	}
 }
 
 void ofApp::exit() {
