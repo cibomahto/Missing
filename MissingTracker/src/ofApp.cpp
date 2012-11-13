@@ -9,28 +9,26 @@ void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
-	kinect.init(false, false);
-	kinect.setRegistration(false);
-	kinect.open();
+	kinect.setup();
 	
 	osc.setup("sonoss-Mac-mini.local", 145145);
 	
 	gui.setup(280, 800);
-	gui.addPanel("Grid");
-	gui.addToggle("showCloud");
-	gui.addToggle("showFlatCloud");
-	gui.addSlider("minArea", 0, 0, 10);
-	gui.addSlider("maxArea", 40, 0, 40);
-	gui.addSlider("contourThreshold", 5, 0, 64);
-	gui.addToggle("showGrid", true);
-	gui.addSlider("zoom", .16, 0, 1);
-	gui.addSlider("gridDivisions", 64, 1, 128, true);
-	gui.addSlider("presenceScale", 100, 1, 500);
-	
-	gui.addPanel("Camera");
+	gui.addPanel("Analysis");
 	gui.addSlider("calibrationTime", 2, 1, 10);
 	gui.addSlider("calibrationProgress", 0, 0, 1);
 	gui.addToggle("calibrate", true);
+	gui.addToggle("showCloud");
+	gui.addToggle("showFlatCloud");
+	gui.addToggle("showGrid", true);
+	gui.addSlider("zoom", .16, 0, 1);
+	gui.addSlider("minArea", 0, 0, 10);
+	gui.addSlider("maxArea", 40, 0, 40);
+	gui.addSlider("contourThreshold", 5, 0, 64);
+	gui.addSlider("gridDivisions", 64, 1, 128, true);
+	gui.addSlider("presenceScale", 100, 1, 500);
+	
+	gui.addPanel("Kinect");
 	gui.addSlider("threshold", 16, 0, 64, true);
 	gui.addSlider("upx", 0, -1, 1);
 	gui.addSlider("upy", 1, -1, 1);
@@ -42,9 +40,6 @@ void ofApp::setup() {
 	calibrating = false;
 	calibrationStart = 0;
 	clearBackground = false;
-	
-	background.allocate(kinect.getWidth(), kinect.getHeight(), OF_IMAGE_GRAYSCALE);
-	valid.allocate(kinect.getWidth(), kinect.getHeight(), OF_IMAGE_GRAYSCALE);
 	
 	ofResetElapsedTimeCounter();
 }
@@ -65,101 +60,51 @@ void ofApp::update() {
 		clearBackground = true;
 	}
 	
+	gui.setValueF("calibrationProgress", calibrationProgress / calibrationTime);
+	
+	if(clearBackground) {
+		kinect.setClearBackground();
+		clearBackground = false;
+	}
+	kinect.setCalibrating(calibrating);
+	kinect.setUpVector(ofVec3f(gui.getValueF("upx"), gui.getValueF("upy"), gui.getValueF("upz")));
+	kinect.setBackgroundThreshold(gui.getValueI("threshold"));
+	kinect.setOffset(ofVec2f(gui.getValueF("gridOffsetX"), gui.getValueF("gridOffsetY")));
+	kinect.setRotation(gui.getValueF("rotation"));
+	
 	kinect.update();
 	if(kinect.isFrameNew()) {
-		filter.update(kinect.getDepthPixelsRef());
-	
-		unsigned char* kinectPixels = filter.getMasked().getPixels();
-		unsigned char* validPixels = valid.getPixels();
-		unsigned char* backgroundPixels = background.getPixels();
-		float* presencePixels = presence.getPixels();
-		int width = kinect.getWidth(), height = kinect.getHeight();
-		int n = width * height;
-		
-		if(clearBackground) {
-			for(int i = 0; i < n; i++) {
-				backgroundPixels[i] = 0;
-			}
-			background.update();
-			clearBackground = false;
-		}
-		
-		if(calibrating) {
-			for(int i = 0; i < n; i++) {
-				if(kinectPixels[i] != 0) {
-					if(backgroundPixels[i] == 0) {
-						backgroundPixels[i] = kinectPixels[i];
-					}	else {
-						backgroundPixels[i] = (backgroundPixels[i] + kinectPixels[i]) / 2;
-					}
-				}
-			}
-			background.update();
-			gui.setValueF("calibrationProgress", calibrationProgress / calibrationTime);
-		}
-		
-		ofQuaternion orientationQuat;
-		ofVec3f up(gui.getValueF("upx"), gui.getValueF("upy"), gui.getValueF("upz"));
-		up.normalize();
-		orientationQuat.makeRotate(ofVec3f(0, 0, 1), up);
-		ofMatrix4x4 orientationMat;
-		orientationQuat.get(orientationMat);
-		
-		int gridDivisions = gui.getValueF("gridDivisions");
-		presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
-		int presenceArea = gridDivisions * gridDivisions;
-		for(int i = 0; i < presenceArea; i++) {
-			presence.getPixels()[i] = 0;
-		}
-		
-		int threshold = gui.getValueI("threshold");
-		for(int i = 0; i < n; i++) {
-			int kinectPixel = kinectPixels[i];
-			int backgroundPixel = backgroundPixels[i];
-			bool far = abs(kinectPixel - backgroundPixel) > threshold;
-			if(kinectPixel > 0 &&
-				(backgroundPixel == 0 ||
-				(backgroundPixel > 0 && far))) {
-				validPixels[i] = 255;
-			} else {
-				validPixels[i] = 0;
-			}
-		}
-
+		// for both kinects
 		foregroundCloud.setMode(OF_PRIMITIVE_POINTS);
 		foregroundCloud.clear();
-		foregroundFlat.setMode(OF_PRIMITIVE_POINTS);
-		foregroundFlat.clear();
-		ofVec2f gridOffset(gui.getValueF("gridOffsetX"), gui.getValueF("gridOffsetY"));
-		float rotation = gui.getValueF("rotation");
+		int gridDivisions = gui.getValueF("gridDivisions");
+		presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
+		float* presencePixels = presence.getPixels();
+		int presenceArea = gridDivisions * gridDivisions;
+		for(int i = 0; i < presenceArea; i++) {
+			presencePixels[i] = 0;
+		}
+		int n = 640 * 480;
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
-		const unsigned short* rawDepthPixels = kinect.getRawDepthPixels();
-		int i = 0;
-		for(int y = 0; y < height; y++) {
-			for(int x = 0; x < width; x++) {
-				if(x + 1 < width &&	validPixels[i] && validPixels[i + 1]) {
-					ofVec3f cur = kinect.getWorldCoordinateAt(x, y, rawDepthPixels[i]);
-					ofVec3f right = kinect.getWorldCoordinateAt(x + 1, y, rawDepthPixels[i + 1]);
-					float curArea = cur.distance(right);
-					curArea *= curArea;
-					foregroundCloud.addVertex(cur);
-					ofVec2f flat = orientationMat * cur;
-					flat += gridOffset;
-					flat.rotate(rotation);
-					foregroundFlat.addVertex(flat);
-					flat.x = (int) ofMap(flat.x, -stageSize / 2, +stageSize / 2, 0, gridDivisions, true);
-					flat.y = (int) ofMap(flat.y, -stageSize / 2, +stageSize / 2, 0, gridDivisions, true);
-					int i  = flat.y * gridDivisions + flat.x;
-					if(presencePixels[i] < 1) {
-						presencePixels[i] += curArea * presenceScale;
-					}
-				}
-				i++;
+		
+		// with each kinect
+		vector<ofVec3f>& meshVertices = kinect.getMesh().getVertices();
+		vector<float>& meshArea = kinect.getMeshArea();
+		foregroundCloud.addVertices(meshVertices);
+		for(int i = 0; i < meshArea.size(); i++) {
+			ofVec3f& cur = meshVertices[i];
+			int x = (cur.x + stageSize / 2) * gridDivisions / stageSize;
+			int y = (cur.y + stageSize / 2) * gridDivisions / stageSize;
+			int j  = y * gridDivisions + x;
+			if(presencePixels[j] < 1) {
+				presencePixels[j] += meshArea[i] * presenceScale;
 			}
 		}
-		valid.update();
+		
+		foregroundFlat.setMode(OF_PRIMITIVE_POINTS);
+		foregroundFlat.clear();
 		presence.update();
-
+		
 		contourFinder.setMinArea(gui.getValueF("minArea"));
 		contourFinder.setMaxArea(gui.getValueF("maxArea"));
 		contourFinder.setThreshold(gui.getValueF("contourThreshold"));
@@ -191,11 +136,11 @@ void drawChunkyCloud(ofMesh& mesh, int innerRadius = 1, int outerRadius = 3) {
 
 void ofApp::draw() {
 	ofSetColor(255);
-	if(kinect.isConnected()) {
-		kinect.drawDepth(640, 0);
+	if(kinect.getKinect().isConnected()) {
+		kinect.getKinect().drawDepth(640, 0);
+		kinect.getBackground().draw(0, 480);
+		kinect.getValid().draw(640, 480);
 	}
-	background.draw(0, 480);
-	valid.draw(640, 480);
 	
 	if(gui.getValueB("showGrid")) {
 		ofPushMatrix();
@@ -237,6 +182,3 @@ void ofApp::draw() {
 	}
 }
 
-void ofApp::exit() {
-	kinect.close();
-}
