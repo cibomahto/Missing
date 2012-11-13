@@ -4,12 +4,15 @@ using namespace ofxCv;
 using namespace cv;
 
 const float stageSize = feetInchesToMillimeters(15, 8);
+const string kinectSerialSw = "A00363A04112112A";
+const string kinectSerialNe = "A00362913019109A";
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	
-	kinect.setup();
+	kinectSw.setup(kinectSerialSw);
+	kinectNe.setup(kinectSerialNe);
 	
 	osc.setup("sonoss-Mac-mini.local", 145145);
 	
@@ -28,14 +31,23 @@ void ofApp::setup() {
 	gui.addSlider("gridDivisions", 64, 1, 128, true);
 	gui.addSlider("presenceScale", 100, 1, 500);
 	
-	gui.addPanel("Kinect");
-	gui.addSlider("threshold", 16, 0, 64, true);
-	gui.addSlider("upx", 0, -1, 1);
-	gui.addSlider("upy", 1, -1, 1);
-	gui.addSlider("upz", 0, -1, 1);
-	gui.addSlider("gridOffsetX", 0, -4000, 4000);
-	gui.addSlider("gridOffsetY", 1500, -4000, 4000);
-	gui.addSlider("rotation", 0, -180, 180);
+	gui.addPanel("KinectSw");
+	gui.addSlider("thresholdSw", 16, 0, 64, true);
+	gui.addSlider("upxSw", 0, -1, 1);
+	gui.addSlider("upySw", 1, -1, 1);
+	gui.addSlider("upzSw", 0, -1, 1);
+	gui.addSlider("gridOffsetXSw", 0, -4000, 4000);
+	gui.addSlider("gridOffsetYSw", 1500, -4000, 4000);
+	gui.addSlider("rotationSw", 0, -180, 180);
+	
+	gui.addPanel("KinectNe");
+	gui.addSlider("thresholdNe", 16, 0, 64, true);
+	gui.addSlider("upxNe", 0, -1, 1);
+	gui.addSlider("upyNe", 1, -1, 1);
+	gui.addSlider("upzNe", 0, -1, 1);
+	gui.addSlider("gridOffsetXNe", 0, -4000, 4000);
+	gui.addSlider("gridOffsetYNe", 1500, -4000, 4000);
+	gui.addSlider("rotationNe", 0, -180, 180);
 	
 	calibrating = false;
 	calibrationStart = 0;
@@ -62,21 +74,33 @@ void ofApp::update() {
 	
 	gui.setValueF("calibrationProgress", calibrationProgress / calibrationTime);
 	
-	if(clearBackground) {
-		kinect.setClearBackground();
-		clearBackground = false;
+	vector<KinectTracker*> kinects;
+	kinects.push_back(&kinectSw);
+	kinects.push_back(&kinectNe);
+	vector<string> suffixes;
+	suffixes.push_back("Sw");
+	suffixes.push_back("Ne");
+	bool newFrame = false;
+	for(int i = 0; i < kinects.size(); i++) {
+		KinectTracker* kinect = kinects[i];
+		string& suffix = suffixes[i];
+		if(clearBackground) {
+			kinect->setClearBackground();
+		}
+		kinect->setCalibrating(calibrating);
+		kinect->setUpVector(ofVec3f(gui.getValueF("upx" + suffix), gui.getValueF("upy" + suffix), gui.getValueF("upz" + suffix)));
+		kinect->setBackgroundThreshold(gui.getValueI("threshold" + suffix));
+		kinect->setOffset(ofVec2f(gui.getValueF("gridOffsetX" + suffix), gui.getValueF("gridOffsetY" + suffix)));
+		kinect->setRotation(gui.getValueF("rotation" + suffix));
+		
+		kinect->update();
+		if(kinect->isFrameNew()) {
+			newFrame = true;
+		}
 	}
-	kinect.setCalibrating(calibrating);
-	kinect.setUpVector(ofVec3f(gui.getValueF("upx"), gui.getValueF("upy"), gui.getValueF("upz")));
-	kinect.setBackgroundThreshold(gui.getValueI("threshold"));
-	kinect.setOffset(ofVec2f(gui.getValueF("gridOffsetX"), gui.getValueF("gridOffsetY")));
-	kinect.setRotation(gui.getValueF("rotation"));
+	clearBackground = false;
 	
-	kinect.update();
-	if(kinect.isFrameNew()) {
-		// for both kinects
-		foregroundCloud.setMode(OF_PRIMITIVE_POINTS);
-		foregroundCloud.clear();
+	if(newFrame) {
 		int gridDivisions = gui.getValueF("gridDivisions");
 		presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
 		float* presencePixels = presence.getPixels();
@@ -87,24 +111,23 @@ void ofApp::update() {
 		int n = 640 * 480;
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
 		
-		// with each kinect
-		vector<ofVec3f>& meshVertices = kinect.getMesh().getVertices();
-		vector<float>& meshArea = kinect.getMeshArea();
-		foregroundCloud.addVertices(meshVertices);
-		for(int i = 0; i < meshArea.size(); i++) {
-			ofVec3f& cur = meshVertices[i];
-			int x = (cur.x + stageSize / 2) * gridDivisions / stageSize;
-			int y = (cur.y + stageSize / 2) * gridDivisions / stageSize;
-			int j  = y * gridDivisions + x;
-			if(presencePixels[j] < 1) {
-				presencePixels[j] += meshArea[i] * presenceScale;
+		for(int i = 0; i < kinects.size(); i++) {
+			KinectTracker* kinect = kinects[i];
+			vector<ofVec3f>& meshVertices = kinect->getMesh().getVertices();
+			vector<float>& meshArea = kinect->getMeshArea();
+			for(int i = 0; i < meshArea.size(); i++) {
+				ofVec3f& cur = meshVertices[i];
+				int x = (cur.x + stageSize / 2) * gridDivisions / stageSize;
+				int y = (cur.y + stageSize / 2) * gridDivisions / stageSize;
+				int j  = y * gridDivisions + x;
+				if(x >= 0 && x < gridDivisions && y >= 0 && y < gridDivisions && presencePixels[j] < 1) {
+					presencePixels[j] += meshArea[i] * presenceScale;
+				}
 			}
 		}
-		
-		foregroundFlat.setMode(OF_PRIMITIVE_POINTS);
-		foregroundFlat.clear();
 		presence.update();
-		
+	
+		// wrapping up analysis
 		contourFinder.setMinArea(gui.getValueF("minArea"));
 		contourFinder.setMaxArea(gui.getValueF("maxArea"));
 		contourFinder.setThreshold(gui.getValueF("contourThreshold"));
@@ -136,13 +159,23 @@ void drawChunkyCloud(ofMesh& mesh, int innerRadius = 1, int outerRadius = 3) {
 
 void ofApp::draw() {
 	ofSetColor(255);
-	if(kinect.getKinect().isConnected()) {
-		kinect.getKinect().drawDepth(640, 0);
-		kinect.getBackground().draw(0, 480);
-		kinect.getValid().draw(640, 480);
-	}
 	
-	if(gui.getValueB("showGrid")) {
+	vector<KinectTracker*> kinects;
+	kinects.push_back(&kinectSw);
+	kinects.push_back(&kinectNe);
+	ofPushMatrix();
+	for(int i = 0; i < kinects.size(); i++) {
+		KinectTracker* kinect = kinects[i];		
+		if(kinect->getKinect().isConnected()) {
+			kinect->getKinect().drawDepth(0, 0, 320, 240);
+			kinect->getBackground().draw(0, 240, 320, 240);
+			kinect->getValid().draw(0, 480, 320, 240);
+		}
+		ofTranslate(320, 0);
+	}
+	ofPopMatrix();
+	
+	if(gui.getValueB("showGrid") && presence.isAllocated()) {
 		ofPushMatrix();
 		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
 		float zoom = gui.getValueF("zoom");
@@ -170,14 +203,14 @@ void ofApp::draw() {
 		
 		if(gui.getValueB("showFlatCloud")) {
 			ofSetColor(255);
-			drawChunkyCloud(foregroundFlat);
+			//drawChunkyCloud(foregroundFlat);
 		}
 		ofPopMatrix();
 	}
 	
 	if(gui.getValueB("showCloud")) {
 		cam.begin();
-		drawChunkyCloud(foregroundCloud);
+		//drawChunkyCloud(foregroundCloud);
 		cam.end();
 	}
 }
