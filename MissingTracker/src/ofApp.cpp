@@ -7,6 +7,8 @@ const float stageSize = feetInchesToMillimeters(15, 8);
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
+	ofSetLogLevel(OF_LOG_VERBOSE);
+	
 	kinect.init(false, false);
 	kinect.setRegistration(false);
 	kinect.open();
@@ -15,8 +17,8 @@ void ofApp::setup() {
 	
 	gui.setup(280, 800);
 	gui.addPanel("Grid");
-	gui.addSlider("minArea", 2, 1, 40);
-	gui.addSlider("maxArea", 40, 1, 40);
+	gui.addSlider("minArea", 0, 0, 10);
+	gui.addSlider("maxArea", 40, 0, 40);
 	gui.addSlider("contourThreshold", 5, 0, 64);
 	gui.addToggle("showGrid", true);
 	gui.addSlider("zoom", .16, 0, 1);
@@ -41,6 +43,8 @@ void ofApp::setup() {
 	
 	background.allocate(kinect.getWidth(), kinect.getHeight(), OF_IMAGE_GRAYSCALE);
 	valid.allocate(kinect.getWidth(), kinect.getHeight(), OF_IMAGE_GRAYSCALE);
+	
+	ofResetElapsedTimeCounter();
 }
 
 void ofApp::update() {
@@ -61,7 +65,9 @@ void ofApp::update() {
 	
 	kinect.update();
 	if(kinect.isFrameNew()) {
-		unsigned char* kinectPixels = kinect.getDepthPixels();
+		filter.update(kinect.getDepthPixelsRef());
+	
+		unsigned char* kinectPixels = filter.getMasked().getPixels();
 		unsigned char* validPixels = valid.getPixels();
 		unsigned char* backgroundPixels = background.getPixels();
 		float* presencePixels = presence.getPixels();

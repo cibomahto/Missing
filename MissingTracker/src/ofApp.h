@@ -1,6 +1,4 @@
 /*
-* mask noisy areas around edges
-* use an iir filter on depth image
 * add second kinect
 * tune
 */
@@ -13,6 +11,7 @@
 #include "ofxCv.h"
 #include "Conversion.h"
 #include "ofxOsc.h"
+#include "KinectFilter.h"
 
 class ofApp : public ofBaseApp {
 public:
@@ -29,9 +28,10 @@ public:
 	ofImage valid, background;
 	
 	ofFloatImage presence;
-	ofMesh foregroundFlat;
-	ofMesh foregroundCloud;
+	ofMesh foregroundFlat, foregroundCloud;
 	ofEasyCam cam;
+	
+	KinectFilter filter;
 	
 	ofxCv::ContourFinder contourFinder;
 	

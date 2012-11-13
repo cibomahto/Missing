@@ -196,6 +196,7 @@
 		279E99FE16518B61007955E4 /* background_segm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = background_segm.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/background_segm.hpp; sourceTree = SOURCE_ROOT; };
 		279E99FF16518B61007955E4 /* tracking.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = tracking.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/tracking.hpp; sourceTree = SOURCE_ROOT; };
 		279E9A0016518B61007955E4 /* video.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = video.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/video/video.hpp; sourceTree = SOURCE_ROOT; };
+		279E9B371651AB86007955E4 /* KinectFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectFilter.h; sourceTree = "<group>"; };
 		30F2B5561415565D00597A7B /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		30F2B5581415565D00597A7B /* usb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "usb-1.0.a"; sourceTree = "<group>"; };
 		30F2B58D1415565D00597A7B /* ofxBase3DVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBase3DVideo.h; sourceTree = "<group>"; };
@@ -1048,6 +1049,7 @@
 				270B50CA1650690B00B79CDC /* ofApp.cpp */,
 				270B50CB1650690B00B79CDC /* ofApp.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+				279E9B371651AB86007955E4 /* KinectFilter.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
