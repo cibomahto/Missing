@@ -9,6 +9,8 @@ int NUMBER_OF_SPEAKERS = 50;   // Number of attached speakers
 
 
 Boolean sendPositions = false;
+Boolean rangeTest = false;
+
 int[] pos;                     // Speaker positions to send
 
 int address = 0;
@@ -58,6 +60,10 @@ void setup() {
   cp5.addToggle("sendPositions")
    .setPosition(10,10)
    ;
+
+  cp5.addToggle("rangeTest")
+   .setPosition(150,10)
+   ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     int speakersPerCol = 17;
@@ -104,13 +110,47 @@ void setup() {
 }
 
 
+float   rangeTestToggleTime = 0;
+boolean rangeTestDirection  = false;
+
 void draw() {
   background(0);
   stroke(255);
   
+  if(rangeTest) {
+    if(rangeTestToggleTime == 0) {
+      rangeTestToggleTime = millis();
+    }
+    
+    if(millis() > rangeTestToggleTime) {
+      int newPosition;
+      if(rangeTestDirection) {
+        newPosition = 0;
+      }
+      else {
+        newPosition = 127;
+      }
+      
+      for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+        pos[i] = newPosition;
+      }
+
+      rangeTestToggleTime = millis() + 10000;
+      rangeTestDirection = !rangeTestDirection;
+    }
+    
+  }
+
+  // Send random positions
+  
+//  if(random(0,10)>8) {
+//    pos[(int)random(0,NUMBER_OF_SPEAKERS-1)] = (int)random(0,127);
+//  }
+  
   if(sendPositions) {
     sendPositionData();
   }
+
 }
 
 void controlEvent(ControlEvent theEvent) {
@@ -139,6 +179,10 @@ void controlEvent(ControlEvent theEvent) {
     // Position
     if (theEvent.controller().name().startsWith("sendPositions")) {
       sendPositions = theEvent.value() == 1;
+    }
+
+    if (theEvent.controller().name().startsWith("rangeTest")) {
+      rangeTest = theEvent.value() == 1;
     }
     
     // check if theEvent is coming from a position controller
