@@ -4,12 +4,14 @@ import processing.serial.*;
 ControlP5 cp5;
 Serial outPort;
 
+String VERSION_STRING = "1.0";
 
 int NUMBER_OF_SPEAKERS = 50;   // Number of attached speakers
 
 
 Boolean sendPositions = false;
 Boolean rangeTest = false;
+Boolean randomMotion = false;
 
 int[] pos;                     // Speaker positions to send
 
@@ -51,9 +53,19 @@ void setup() {
   
   pos = new int[NUMBER_OF_SPEAKERS];
   
-  String portName = Serial.list()[0];
+  String portName = "";
+  
+  for(String port : Serial.list()) {
+    if(!port.contains("Bluetooth")) {
+      portName = port;
+    }
+  }
+  
+  
+  
+  println(portName);
+  
   outPort = new Serial(this, portName, 57600);
-  println("Attaching to port " + portName);
   
   
   // Position controls
@@ -62,7 +74,11 @@ void setup() {
    ;
 
   cp5.addToggle("rangeTest")
-   .setPosition(150,10)
+   .setPosition(110,10)
+   ;
+   
+  cp5.addToggle("randomMotion")
+   .setPosition(210,10)
    ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
@@ -107,6 +123,23 @@ void setup() {
    .setPosition(140, 450)
    ;
 
+  // Debug info
+  cp5.addTextlabel("label1")
+    .setText("Debugger version " + VERSION_STRING)
+    .setPosition(10,575)
+    ;
+
+  if(portName != "") {
+    cp5.addTextlabel("label2")
+     .setText("Transmitting on " + portName)
+     .setPosition(10,590)
+     ;
+  } else {
+    cp5.addTextlabel("label2")
+     .setText("Could not find a port to transmit on!")
+     .setPosition(10,590)
+     ;
+  }    
 }
 
 
@@ -143,14 +176,15 @@ void draw() {
 
   // Send random positions
   
-//  if(random(0,10)>8) {
-//    pos[(int)random(0,NUMBER_OF_SPEAKERS-1)] = (int)random(0,127);
-//  }
+  if(randomMotion) {
+    if(random(0,10)>8) {
+      pos[(int)random(0,NUMBER_OF_SPEAKERS-1)] = (int)random(0,127);
+    } 
+  }
   
   if(sendPositions) {
     sendPositionData();
   }
-
 }
 
 void controlEvent(ControlEvent theEvent) {
@@ -183,6 +217,10 @@ void controlEvent(ControlEvent theEvent) {
 
     if (theEvent.controller().name().startsWith("rangeTest")) {
       rangeTest = theEvent.value() == 1;
+    }
+
+    if (theEvent.controller().name().startsWith("randomMotion")) {
+      randomMotion = theEvent.value() == 1;
     }
     
     // check if theEvent is coming from a position controller
