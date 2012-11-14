@@ -31,7 +31,8 @@ void ofApp::setup() {
 	gui.addSlider("contourThreshold", 5, 0, 64);
 	gui.addSlider("gridDivisions", 64, 1, 256, true);
 	gui.addSlider("presenceBlur", 0, 0, 16, true);
-	gui.addSlider("presenceScale", 100, 1, 200);
+	gui.addSlider("presenceFade", 0, 0, 10);
+	gui.addSlider("presenceScale", 32, 1, 64);
 	
 	gui.addPanel("KinectSw");
 	gui.addSlider("thresholdSw", 16, 0, 128, true);
@@ -44,6 +45,8 @@ void ofApp::setup() {
 	gui.addSlider("gridOffsetXNe", 0, -4000, 4000);
 	gui.addSlider("gridOffsetYNe", 0, -4000, 4000);
 	gui.addSlider("rotationNe", 0, -180, 180);
+	
+	gui.loadSettings("settings.xml");
 	
 	calibrating = false;
 	calibrationStart = 0;
@@ -99,11 +102,13 @@ void ofApp::update() {
 	
 	if(newFrame) {
 		int gridDivisions = gui.getValueF("gridDivisions");
-		presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
-		float* presencePixels = presence.getPixels();
+		ofFloatImage curPresence;
+		curPresence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
+		imitate(presence, curPresence);
+		float* curPresencePixels = curPresence.getPixels();
 		int presenceArea = gridDivisions * gridDivisions;
 		for(int i = 0; i < presenceArea; i++) {
-			presencePixels[i] = 0;
+			curPresencePixels[i] = 0;
 		}
 		int n = 640 * 480;
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
@@ -117,21 +122,32 @@ void ofApp::update() {
 				int x = (cur.x + stageSize / 2) * gridDivisions / stageSize;
 				int y = (cur.y + stageSize / 2) * gridDivisions / stageSize;
 				int j  = y * gridDivisions + x;
-				if(x >= 0 && x < gridDivisions && y >= 0 && y < gridDivisions && presencePixels[j] < 1) {
-					presencePixels[j] += meshArea[i] * presenceScale;
+				if(x >= 0 && x < gridDivisions && y >= 0 && y < gridDivisions && curPresencePixels[j] < 1) {
+					curPresencePixels[j] += meshArea[i] * presenceScale;
 				}
 			}
 		}
 		int presenceBlur = gui.getValueI("presenceBlur");
 		if(presenceBlur > 0) {
-			blur(presence, presenceBlur);
+			blur(curPresence, presenceBlur);
+		}
+		
+		float contourThreshold = gui.getValueF("contourThreshold");
+		Mat curPresenceMat = toCv(curPresence);
+		Mat presenceMat = toCv(presence);
+		float learningTime = gui.getValueF("presenceFade");
+		if(learningTime > 0) {
+			float learningRate = 1. - powf(1. - (contourThreshold / 255.), 1. / learningTime);
+			accumulateWeighted(curPresenceMat, presenceMat, learningRate);
+		} else {
+			presence = curPresence;
 		}
 		presence.update();
 	
 		// wrapping up analysis
 		contourFinder.setMinAreaRadius(gui.getValueF("minAreaRadius"));
 		contourFinder.setMaxAreaRadius(gui.getValueF("maxAreaRadius"));
-		contourFinder.setThreshold(gui.getValueF("contourThreshold"));
+		contourFinder.setThreshold(contourThreshold);
 		ofPixels presenceBytes;
 		ofxCv::copy(presence, presenceBytes);
 		contourFinder.findContours(presenceBytes);

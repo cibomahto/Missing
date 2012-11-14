@@ -25,7 +25,7 @@ public:
 	
 	KinectTracker kinectSw, kinectNe;
 	
-	ofFloatImage presence;	
+	ofFloatImage presence;
 	ofxCv::ContourFinder contourFinder;
 	ofxOscSender osc;
 	
