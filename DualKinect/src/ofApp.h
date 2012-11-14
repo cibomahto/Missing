@@ -10,4 +10,5 @@ public:
 	void draw();
 	
 	ofxKinect kinect1, kinect2;
+	ofVec3f smoothDown1, smoothDown2;
 };

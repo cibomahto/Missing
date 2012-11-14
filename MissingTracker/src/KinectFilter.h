@@ -29,7 +29,7 @@ protected:
 public:
 	KinectFilter()
 	:kinectFrameCount(0)
-	,delay(8)
+	,delay(12)
 	{
 	}
 	void setDelay(unsigned int delay) {

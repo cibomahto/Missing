@@ -6,6 +6,7 @@ using namespace cv;
 const float stageSize = feetInchesToMillimeters(15, 8);
 const string kinectSerialSw = "A00363A04112112A";
 const string kinectSerialNe = "A00362913019109A";
+const int gridSize = 1024;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
@@ -14,7 +15,7 @@ void ofApp::setup() {
 	kinectSw.setup(kinectSerialSw);
 	kinectNe.setup(kinectSerialNe);
 	
-	osc.setup("sonoss-Mac-mini.local", 145145);
+	osc.setup("thexxexhibit.local", 145145);
 	
 	gui.setup(280, 800);
 	gui.addPanel("Analysis");
@@ -22,31 +23,26 @@ void ofApp::setup() {
 	gui.addSlider("calibrationProgress", 0, 0, 1);
 	gui.addToggle("calibrate", true);
 	gui.addToggle("showCloud");
-	gui.addToggle("showFlatCloud");
-	gui.addToggle("showGrid", true);
-	gui.addSlider("zoom", .16, 0, 1);
-	gui.addSlider("minArea", 0, 0, 10);
-	gui.addSlider("maxArea", 40, 0, 40);
+	gui.addSlider("maxStretch", 100, 0, 500);
+	gui.addSlider("zClipMin", 200, 0, 3000);
+	gui.addSlider("zClipMax", 2600, 0, 3000);
+	gui.addSlider("minAreaRadius", 0, 0, 10);
+	gui.addSlider("maxAreaRadius", 40, 0, 40);
 	gui.addSlider("contourThreshold", 5, 0, 64);
-	gui.addSlider("gridDivisions", 64, 1, 128, true);
-	gui.addSlider("presenceScale", 100, 1, 500);
+	gui.addSlider("gridDivisions", 64, 1, 256, true);
+	gui.addSlider("presenceBlur", 0, 0, 16, true);
+	gui.addSlider("presenceScale", 100, 1, 200);
 	
 	gui.addPanel("KinectSw");
-	gui.addSlider("thresholdSw", 16, 0, 64, true);
-	gui.addSlider("upxSw", 0, -1, 1);
-	gui.addSlider("upySw", 1, -1, 1);
-	gui.addSlider("upzSw", 0, -1, 1);
+	gui.addSlider("thresholdSw", 16, 0, 128, true);
 	gui.addSlider("gridOffsetXSw", 0, -4000, 4000);
-	gui.addSlider("gridOffsetYSw", 1500, -4000, 4000);
+	gui.addSlider("gridOffsetYSw", 0, -4000, 4000);
 	gui.addSlider("rotationSw", 0, -180, 180);
 	
 	gui.addPanel("KinectNe");
-	gui.addSlider("thresholdNe", 16, 0, 64, true);
-	gui.addSlider("upxNe", 0, -1, 1);
-	gui.addSlider("upyNe", 1, -1, 1);
-	gui.addSlider("upzNe", 0, -1, 1);
+	gui.addSlider("thresholdNe", 16, 0, 128, true);
 	gui.addSlider("gridOffsetXNe", 0, -4000, 4000);
-	gui.addSlider("gridOffsetYNe", 1500, -4000, 4000);
+	gui.addSlider("gridOffsetYNe", 0, -4000, 4000);
 	gui.addSlider("rotationNe", 0, -180, 180);
 	
 	calibrating = false;
@@ -88,7 +84,8 @@ void ofApp::update() {
 			kinect->setClearBackground();
 		}
 		kinect->setCalibrating(calibrating);
-		kinect->setUpVector(ofVec3f(gui.getValueF("upx" + suffix), gui.getValueF("upy" + suffix), gui.getValueF("upz" + suffix)));
+		kinect->setZClip(gui.getValueF("zClipMin"), gui.getValueF("zClipMax"));
+		kinect->setMaxStretch(gui.getValueF("maxStretch"));
 		kinect->setBackgroundThreshold(gui.getValueI("threshold" + suffix));
 		kinect->setOffset(ofVec2f(gui.getValueF("gridOffsetX" + suffix), gui.getValueF("gridOffsetY" + suffix)));
 		kinect->setRotation(gui.getValueF("rotation" + suffix));
@@ -125,11 +122,15 @@ void ofApp::update() {
 				}
 			}
 		}
+		int presenceBlur = gui.getValueI("presenceBlur");
+		if(presenceBlur > 0) {
+			blur(presence, presenceBlur);
+		}
 		presence.update();
 	
 		// wrapping up analysis
-		contourFinder.setMinArea(gui.getValueF("minArea"));
-		contourFinder.setMaxArea(gui.getValueF("maxArea"));
+		contourFinder.setMinAreaRadius(gui.getValueF("minAreaRadius"));
+		contourFinder.setMaxAreaRadius(gui.getValueF("maxAreaRadius"));
 		contourFinder.setThreshold(gui.getValueF("contourThreshold"));
 		ofPixels presenceBytes;
 		ofxCv::copy(presence, presenceBytes);
@@ -146,72 +147,80 @@ void ofApp::update() {
 	}
 }
 
-void drawChunkyCloud(ofMesh& mesh, int innerRadius = 1, int outerRadius = 3) {
+void drawChunkyCloud(ofMesh& mesh, ofColor color, int innerRadius = 1, int outerRadius = 3) {
 	ofPushStyle();
 	ofSetColor(0);
 	glPointSize(outerRadius);
 	mesh.draw();
-	ofSetColor(255);
+	ofSetColor(color);
 	glPointSize(innerRadius);
 	mesh.draw();
 	ofPopStyle();
 }
 
 void ofApp::draw() {
+	ofBackground(255);
 	ofSetColor(255);
 	
-	vector<KinectTracker*> kinects;
-	kinects.push_back(&kinectSw);
-	kinects.push_back(&kinectNe);
-	ofPushMatrix();
-	for(int i = 0; i < kinects.size(); i++) {
-		KinectTracker* kinect = kinects[i];		
-		if(kinect->getKinect().isConnected()) {
-			kinect->getKinect().drawDepth(0, 0, 320, 240);
-			kinect->getBackground().draw(0, 240, 320, 240);
-			kinect->getValid().draw(0, 480, 320, 240);
-		}
-		ofTranslate(320, 0);
-	}
-	ofPopMatrix();
-	
-	if(gui.getValueB("showGrid") && presence.isAllocated()) {
+	if(presence.isAllocated()) {
 		ofPushMatrix();
-		ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
-		float zoom = gui.getValueF("zoom");
 		int gridDivisions = gui.getValueF("gridDivisions");
-		ofScale(zoom, zoom);
+		float gridScale = (float) gridSize / gridDivisions;
+		ofScale(gridScale, gridScale, gridScale);
 		
-		ofPushMatrix();
-		float gridZoom = stageSize / gridDivisions;
-		ofScale(gridZoom, gridZoom);
-		ofTranslate(-gridDivisions / 2, -gridDivisions / 2);
 		presence.bind();
 		ofSetMinMagFilters(GL_NEAREST, GL_NEAREST);
 		presence.unbind();
 		presence.draw(0, 0);
+		
+		ofPushStyle();
+		ofSetColor(cyanPrint);
+		ofLine(gridDivisions / 2, 0, gridDivisions / 2, gridDivisions);
+		ofLine(0, gridDivisions / 2, gridDivisions, gridDivisions / 2);
+		ofPopStyle();
+		
 		ofPushMatrix();
 		ofPushStyle();
 		ofTranslate(.5, .5);
-		ofSetColor(magentaPrint);
+		ofSetColor(cyanPrint);
 		for(int i = 0; i < contourFinder.size(); i++) {
 			contourFinder.getPolyline(i).draw();
+			ofVec2f position = toOf(contourFinder.getCentroid(i));
+			ofDrawBitmapString(ofToString(contourFinder.getLabel(i)), position);
 		}
 		ofPopStyle();
 		ofPopMatrix();
 		ofPopMatrix();
 		
-		if(gui.getValueB("showFlatCloud")) {
-			ofSetColor(255);
-			//drawChunkyCloud(foregroundFlat);
+		if(gui.getValueB("showCloud")) {
+			ofPushView();
+			ofViewport(0, 0, gridSize, gridSize);
+			ofSetupScreenOrtho(gridSize, gridSize, OF_ORIENTATION_DEFAULT, true, -10000, 10000);
+			ofTranslate(gridSize / 2, gridSize / 2);
+			float cloudScale = (float) gridSize / stageSize;
+			// could do this scale during the point remapping process, then presence calc is simpler
+			ofScale(cloudScale, cloudScale, cloudScale);
+			drawChunkyCloud(kinectSw.getMesh(), magentaPrint);
+			drawChunkyCloud(kinectNe.getMesh(), yellowPrint);
+			ofPopView();
 		}
-		ofPopMatrix();
 	}
 	
-	if(gui.getValueB("showCloud")) {
-		cam.begin();
-		//drawChunkyCloud(foregroundCloud);
-		cam.end();
+	if(ofGetKeyPressed(' ')) {
+		vector<KinectTracker*> kinects;
+		kinects.push_back(&kinectSw);
+		kinects.push_back(&kinectNe);
+		ofPushMatrix();
+		for(int i = 0; i < kinects.size(); i++) {
+			KinectTracker* kinect = kinects[i];		
+			if(kinect->getKinect().isConnected()) {
+				kinect->getKinect().drawDepth(0, 0, 320, 240);
+				kinect->getBackground().draw(0, 240, 320, 240);
+				kinect->getValid().draw(0, 480, 320, 240);
+			}
+			ofTranslate(320, 0);
+		}
+		ofPopMatrix();
 	}
 }
 

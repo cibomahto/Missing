@@ -10,11 +10,16 @@ protected:
 	KinectFilter filter;
 	bool newFrame, clearBackground, calibrating;
 	int backgroundThreshold;
+	ofVec3f accelerationSum;
+	int accelerationCount;
 	ofVec3f upVector;
+	ofMatrix4x4 orientationMat;
 	ofVec2f offset;
 	float rotation;
 	ofMesh mesh;
 	vector<float> meshArea;
+	float zClipMin, zClipMax;
+	float maxStretch;
 	
 public:	
 	KinectTracker()
@@ -23,6 +28,9 @@ public:
 	,calibrating(false)
 	,backgroundThreshold(0)
 	,rotation(0)
+	,zClipMin(-5000)
+	,zClipMax(+5000)
+	,maxStretch(100)
 	{
 	}
 	
@@ -30,8 +38,16 @@ public:
 		kinect.init(false, false);
 		kinect.setRegistration(false);
 		kinect.open(serial);
+		kinect.setDepthClipping(1000, 4000);
 		ofxCv::imitate(background, kinect, CV_8UC1);
 		ofxCv::imitate(valid, kinect, CV_8UC1);
+	}
+	void setZClip(float zClipMin, float zClipMax) {
+		this->zClipMin = zClipMin;
+		this->zClipMax = zClipMax;
+	}
+	void setMaxStretch(float maxStretch) {
+		this->maxStretch = maxStretch;
 	}
 	void setClearBackground() {
 		clearBackground = true;
@@ -41,9 +57,6 @@ public:
 	}
 	void setBackgroundThreshold(int backgroundThreshold) {
 		this->backgroundThreshold = backgroundThreshold;
-	}
-	void setUpVector(ofVec3f upVector) {
-		this->upVector = upVector;
 	}
 	void setOffset(ofVec2f offset) {
 		this->offset = offset;
@@ -67,10 +80,12 @@ public:
 				}
 				background.update();
 				clearBackground = false;
+				accelerationSum = ofVec3f();
+				accelerationCount = 0;
 			}
 			if(calibrating) {
 				for(int i = 0; i < n; i++) {
-					if(kinectPixels[i] != 0) {
+					if(kinectPixels[i] > 0) {
 						if(backgroundPixels[i] == 0) {
 							backgroundPixels[i] = kinectPixels[i];
 						}	else {
@@ -79,25 +94,27 @@ public:
 					}
 				}
 				background.update();
+				accelerationSum += kinect.getRawAccel();
+				accelerationCount++;
+				upVector = -accelerationSum / accelerationCount;
+				upVector.y *= -1;
+				ofQuaternion orientationQuat;
+				upVector.normalize();
+				orientationQuat.makeRotate(ofVec3f(0, 0, 1), upVector);
+				orientationQuat.get(orientationMat);
 			}
 			for(int i = 0; i < n; i++) {
 				int kinectPixel = kinectPixels[i];
 				int backgroundPixel = backgroundPixels[i];
 				bool far = abs(kinectPixel - backgroundPixel) > backgroundThreshold;
-				if(kinectPixel > 0 && (backgroundPixel == 0 || (backgroundPixel > 0 && far))) {
+				if(kinectPixel < 255 && kinectPixel > 0 && (backgroundPixel == 0 || (backgroundPixel > 0 && far))) {
 					validPixels[i] = 255;
 				} else {
 					validPixels[i] = 0;
 				}
 			}
-			valid.update();
-			
-			ofQuaternion orientationQuat;
-			upVector.normalize();
-			orientationQuat.makeRotate(ofVec3f(0, 0, 1), upVector);
-			ofMatrix4x4 orientationMat;
-			orientationQuat.get(orientationMat);
-			
+			valid.update();			
+			mesh.setMode(OF_PRIMITIVE_POINTS);
 			mesh.clear();
 			meshArea.clear();
 			const unsigned short* rawDepthPixels = kinect.getRawDepthPixels();
@@ -109,12 +126,16 @@ public:
 						ofVec3f cur = kinect.getWorldCoordinateAt(x, y, rawDepthPixels[i]);
 						ofVec3f right = kinect.getWorldCoordinateAt(x + 1, y, rawDepthPixels[i + 1]);
 						float curArea = cur.distance(right);
-						curArea *= curArea;
-						cur = orientationMat * cur;
-						cur += offset;
-						cur.rotate(rotation, ofVec3f(0, 0, 1));
-						mesh.addVertex(cur);
-						meshArea.push_back(curArea);
+						if(curArea < maxStretch) {
+							curArea *= curArea;
+							cur = orientationMat * cur;
+							if(cur.z > zClipMin && cur.z < zClipMax) {
+								cur += offset;
+								cur.rotate(rotation, ofVec3f(0, 0, 1));
+								mesh.addVertex(cur);
+								meshArea.push_back(curArea);
+							}
+						}
 					}
 					i++;
 				}
