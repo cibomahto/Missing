@@ -4,11 +4,15 @@ import processing.serial.*;
 ControlP5 cp5;
 Serial outPort;
 
+String VERSION_STRING = "1.0";
 
 int NUMBER_OF_SPEAKERS = 50;   // Number of attached speakers
 
 
 Boolean sendPositions = false;
+Boolean rangeTest = false;
+Boolean randomMotion = false;
+
 int[] pos;                     // Speaker positions to send
 
 int address = 0;
@@ -49,14 +53,32 @@ void setup() {
   
   pos = new int[NUMBER_OF_SPEAKERS];
   
-  String portName = Serial.list()[0];
+  String portName = "";
+  
+  for(String port : Serial.list()) {
+    if(!port.contains("Bluetooth")) {
+      portName = port;
+    }
+  }
+  
+  
+  
+  println(portName);
+  
   outPort = new Serial(this, portName, 57600);
-  println("Attaching to port " + portName);
   
   
   // Position controls
   cp5.addToggle("sendPositions")
    .setPosition(10,10)
+   ;
+
+  cp5.addToggle("rangeTest")
+   .setPosition(110,10)
+   ;
+   
+  cp5.addToggle("randomMotion")
+   .setPosition(210,10)
    ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
@@ -101,12 +123,64 @@ void setup() {
    .setPosition(140, 450)
    ;
 
+  // Debug info
+  cp5.addTextlabel("label1")
+    .setText("Debugger version " + VERSION_STRING)
+    .setPosition(10,575)
+    ;
+
+  if(portName != "") {
+    cp5.addTextlabel("label2")
+     .setText("Transmitting on " + portName)
+     .setPosition(10,590)
+     ;
+  } else {
+    cp5.addTextlabel("label2")
+     .setText("Could not find a port to transmit on!")
+     .setPosition(10,590)
+     ;
+  }    
 }
 
+
+float   rangeTestToggleTime = 0;
+boolean rangeTestDirection  = false;
 
 void draw() {
   background(0);
   stroke(255);
+  
+  if(rangeTest) {
+    if(rangeTestToggleTime == 0) {
+      rangeTestToggleTime = millis();
+    }
+    
+    if(millis() > rangeTestToggleTime) {
+      int newPosition;
+      if(rangeTestDirection) {
+        newPosition = 0;
+      }
+      else {
+        newPosition = 127;
+      }
+      
+      for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+        pos[i] = newPosition;
+      }
+
+      rangeTestToggleTime = millis() + 10000;
+      rangeTestDirection = !rangeTestDirection;
+    }
+    
+  }
+
+  // Send random positions
+  
+  if(randomMotion) {
+    if(random(0,10)>8) {
+      pos[(int)random(0,NUMBER_OF_SPEAKERS-1)] = (int)random(0,127);
+    } 
+  }
   
   if(sendPositions) {
     sendPositionData();
@@ -139,6 +213,14 @@ void controlEvent(ControlEvent theEvent) {
     // Position
     if (theEvent.controller().name().startsWith("sendPositions")) {
       sendPositions = theEvent.value() == 1;
+    }
+
+    if (theEvent.controller().name().startsWith("rangeTest")) {
+      rangeTest = theEvent.value() == 1;
+    }
+
+    if (theEvent.controller().name().startsWith("randomMotion")) {
+      randomMotion = theEvent.value() == 1;
     }
     
     // check if theEvent is coming from a position controller
