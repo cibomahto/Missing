@@ -13,7 +13,6 @@ boolean rangeTest = false;
 boolean randomMotion = false;
 
 int[] pos;                     // Speaker positions to send
-int curPosMin, curPosCenter, curPosMax;
 int[] posMin, posCenter, posMax;
 
 int address = 0;
@@ -25,6 +24,21 @@ void centerTest() {
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     pos[i] = 64;
   }
+}
+
+void curPosMin(int curPosMin) {
+  posMin[address] = curPosMin;
+  pos[address] = curPosMin;
+}
+
+void curPosCenter(int curPosCenter) {
+  posCenter[address] = curPosCenter;
+  pos[address] = curPosCenter;
+}
+
+void curPosMax(int curPosMax) {
+  posMax[address] = curPosMax;
+  pos[address] = curPosMax;
 }
 
 void exportCalibration() {
@@ -108,12 +122,12 @@ void setup() {
    .setPosition(210,10)
    ;
    
-  cp5.addButton("exportCalibration")
+  cp5.addButton("centerTest")
    .setPosition(10,60);
    ;
    
-  cp5.addButton("centerTest")
-   .setPosition(10,90);
+  cp5.addButton("exportCalibration")
+   .setPosition(10,220);
    ;
    
   cp5.addSlider("curPosMin")
@@ -159,7 +173,7 @@ void setup() {
    
   Slider s = cp5.addSlider("address")
    .setPosition(10,350)
-   .setSize(180,30)
+   .setSize(256,30)
    .setRange(0,49)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
