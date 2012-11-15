@@ -32,8 +32,11 @@ float smoothRate = .1;
 float actualSmoothRate = .1;
 float maxSpeed = .5;
 
-void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
+void Speaker::setup(ofVec3f position, ofMesh& wiresCloud, int posMin, int posCenter, int posMax) {
 	this->position = position;
+	this->posMin = posMin;
+	this->posCenter = posCenter;
+	this->posMax = posMax;
 	float crimpPosition = position.z + mountOffset;
 	label = ofToString(count++) + "/" + ofToString((int) millimetersToInches(crimpPosition)) + "in";
 	
@@ -100,9 +103,22 @@ void Speaker::draw(bool showLabel) {
 	ofPopMatrix();
 }
 
-float Speaker::getAngle() {
+float Speaker::getAngle() const {
 	return actualAngle;
 }
+
+float Speaker::getPosMin() const {
+	return posMin;
+}
+
+float Speaker::getPosCenter() const {
+	return posCenter;
+}
+
+float Speaker::getPosMax() const {
+	return posMax;
+}
+
 
 ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
 	float minimum;

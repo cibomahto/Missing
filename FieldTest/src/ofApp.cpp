@@ -22,7 +22,6 @@ void ofApp::setup() {
 	ofEnableAlphaBlending();
 	
 	driver.setup("tty", 9600);
-	driver.setDeadZone(10);
 	
 	MiniFont::setup();
 	
@@ -60,12 +59,19 @@ void ofApp::buildWires() {
 }
 
 void ofApp::buildSpeakers() {
+	ofxXmlSettings calibration;
+	calibration.loadFile("calibration.xml");
 	ofSeedRandom(0);
 	for(int i = 0; i < centersCloud.getNumVertices(); i++) {
 		Speaker speaker;
 		ofVec3f position = centersCloud.getVertex(i);
 		position.z = feetToMillimeters(ofRandom(2, 6));
-		speaker.setup(position, wiresCloud);
+		calibration.pushTag("speaker", i);
+		int posMin = calibration.getValue("posMin", 0);
+		int posCenter = calibration.getValue("posCenter", 64);
+		int posMax = calibration.getValue("posMax", 127);
+		calibration.popTag();
+		speaker.setup(position, wiresCloud, posMin, posCenter, posMax);
 		speakers.push_back(speaker);
 	}
 }
@@ -115,11 +121,7 @@ void ofApp::update() {
 		speakers[i].update(listeners);
 	}
 	
-	vector<float> angles;
-	for(int i = 0; i < speakers.size(); i++) {
-		angles.push_back(speakers[i].getAngle());
-	}
-	driver.update(angles);
+	driver.update(speakers);
 }
 
 void ofApp::drawScene(bool showLabels) {

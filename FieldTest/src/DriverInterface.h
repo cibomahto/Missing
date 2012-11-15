@@ -1,18 +1,18 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Speaker.h"
 
 class DriverInterface {
 public:
 	DriverInterface()
-	:deadAngle(10)
-	,connected(false) {
+	:connected(false) {
 	}
 
 	void setup(string port, int baud) {
 		connected = serial.setup(port, baud);
 	}
-	void update(vector<float> angles) {
+	void update(vector<Speaker>& speakers) {
 		packet.clear();
 		
 		// write the header
@@ -20,11 +20,13 @@ public:
 		packet.push_back(header);
 		
 		// write the remapped values
-		const int minValue = 0, maxValue = 127;
-		const float minAngle = -180 + deadAngle, maxAngle = +180 - deadAngle;
-		vector<unsigned char> remapped(angles.size());
-		for(int i = 0; i < angles.size(); i++) {
-			remapped[i] = (unsigned char) ofMap(angles[i], minAngle, maxAngle, minValue, maxValue);
+		static const int unitsPerDegree = 71.75/90.;
+		vector<unsigned char> remapped(speakers.size());
+		for(int i = 0; i < speakers.size(); i++) {
+			Speaker& cur = speakers[i];
+			float raw = cur.getAngle() * unitsPerDegree;
+			raw -= cur.getPosCenter();
+			remapped[i] = ofClamp(raw, cur.getPosMin(), cur.getPosMax());
 		}
 		packet.insert(packet.end(), remapped.begin(), remapped.end());
 		
@@ -39,16 +41,12 @@ public:
 			serial.writeBytes(&packet.front(), packet.size());
 		}
 	}
-	void setDeadZone(float deadAngle) {
-		this->deadAngle = deadAngle;
-	}
 	vector<unsigned char>& getPacket() {
 		return packet;
 	}
 protected:
 	ofSerial serial;
 	bool connected;
-	float deadAngle;
 	vector<unsigned char> packet;
 	
 	static unsigned char getCrc(vector<unsigned char>& data) {
