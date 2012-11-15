@@ -1,0 +1,99 @@
+<calibrationTime>
+    <val_0>5.000000000</val_0>
+</calibrationTime>
+<calibrationProgress>
+    <val_0>1.000000000</val_0>
+</calibrationProgress>
+<calibrate>
+    <val_0>0.000000000</val_0>
+</calibrate>
+<showCloud>
+    <val_0>1.000000000</val_0>
+</showCloud>
+<zClipMin>
+    <val_0>500.000000000</val_0>
+</zClipMin>
+<zClipMax>
+    <val_0>2500.000000000</val_0>
+</zClipMax>
+<minAreaRadius>
+    <val_0>2.500000000</val_0>
+</minAreaRadius>
+<maxAreaRadius>
+    <val_0>40.000000000</val_0>
+</maxAreaRadius>
+<contourThreshold>
+    <val_0>32.000000000</val_0>
+</contourThreshold>
+<gridDivisions>
+    <val_0>64.750000000</val_0>
+</gridDivisions>
+<presenceBlur>
+    <val_0>4.088889122</val_0>
+</presenceBlur>
+<presenceScale>
+    <val_0>31.955556870</val_0>
+</presenceScale>
+<thresholdSw>
+    <val_0>20.622222900</val_0>
+</thresholdSw>
+<gridOffsetXSw>
+    <val_0>-139.556152344</val_0>
+</gridOffsetXSw>
+<gridOffsetYSw>
+    <val_0>3375.113769531</val_0>
+</gridOffsetYSw>
+<rotationSw>
+    <val_0>37.879943848</val_0>
+</rotationSw>
+<thresholdNe>
+    <val_0>20.622222900</val_0>
+</thresholdNe>
+<gridOffsetXNe>
+    <val_0>-177.777832031</val_0>
+</gridOffsetXNe>
+<gridOffsetYNe>
+    <val_0>2666.666503906</val_0>
+</gridOffsetYNe>
+<rotationNe>
+    <val_0>-130.000000000</val_0>
+</rotationNe>
+<maxStretch>
+    <val_0>150.000000000</val_0>
+</maxStretch>
+<presenceFade>
+    <val_0>1.000000000</val_0>
+</presenceFade>
+<configMaxSpeed>
+    <val_0>50.000000000</val_0>
+</configMaxSpeed>
+<configMinSpeed>
+    <val_0>127.000000000</val_0>
+</configMinSpeed>
+<configStop>
+    <val_0>3.000000000</val_0>
+</configStop>
+<configStart>
+    <val_0>24.000000000</val_0>
+</configStart>
+<rotationSpeed>
+    <val_0>2.333333254</val_0>
+</rotationSpeed>
+<perspectiveScale>
+    <val_0>0.116666667</val_0>
+</perspectiveScale>
+<updateRate>
+    <val_0>0.000000000</val_0>
+</updateRate>
+<autorun>
+    <val_0>0.000000000</val_0>
+</autorun>
+<volumeDelayLength>
+    <val_0>0.500000000</val_0>
+</volumeDelayLength>
+<volumeFadeLength>
+    <val_0>3.000000000</val_0>
+</volumeFadeLength>
+<enableKinect>
+    <val_0>1.000000000</val_0>
+</enableKinect>
