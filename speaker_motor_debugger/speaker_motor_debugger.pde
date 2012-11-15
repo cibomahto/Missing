@@ -20,6 +20,21 @@ Boolean enableAddressProgram = false;
 
 Boolean Reversed = false;
 
+void centerTest() {
+  for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+    pos[i] = 64;
+  }
+}
+
+void exportPositions() {
+  PrintWriter output = createWriter("positions.csv");
+  for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+    output.println(pos[i]);
+  }
+  output.flush();
+  output.close();
+}
+
 void sendPositionData() {
   outPort.write(0xFE);
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
@@ -79,6 +94,14 @@ void setup() {
    
   cp5.addToggle("randomMotion")
    .setPosition(210,10)
+   ;
+   
+  cp5.addButton("exportPositions")
+   .setPosition(10,60);
+   ;
+   
+  cp5.addButton("centerTest")
+   .setPosition(10,90);
    ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
