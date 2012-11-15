@@ -21,7 +21,7 @@ void drawChunkyCloud(ofMesh& mesh, ofColor color, int innerRadius = 1, int outer
 }
 
 void MissingApp::setupControlPanel() {
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	gui.setup(280, 800);
 	gui.addPanel("Config");
@@ -42,6 +42,7 @@ void MissingApp::setupControlPanel() {
 	
 	gui.addPanel("Analysis");
 	gui.addToggle("enableKinect", false);
+	gui.addSlider("calibrationDelay", 2, 0, 10);
 	gui.addSlider("calibrationTime", 2, 1, 10);
 	gui.addSlider("calibrationProgress", 0, 0, 1);
 	gui.addToggle("calibrate", true);

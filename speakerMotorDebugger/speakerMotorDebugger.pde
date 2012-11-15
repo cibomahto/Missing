@@ -8,6 +8,11 @@ String VERSION_STRING = "1.0";
 
 int NUMBER_OF_SPEAKERS = 50;   // Number of attached speakers
 
+int configMaxSpeed = 38;
+int configMinSpeed = 100;
+int configStop = 2;
+int configStart = 10;
+
 boolean sendPositions = false;
 boolean rangeTest = false;
 boolean randomMotion = false;
@@ -57,7 +62,11 @@ void exportCalibration() {
 }
 
 void sendPositionData() {
-  outPort.write(0xFE);
+  outPort.write(0xfe);
+  outPort.write(configMaxSpeed); // max speed
+  outPort.write(configMinSpeed); // min speed
+  outPort.write(configStop); // stop
+  outPort.write(configStart); // start
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     outPort.write(pos[i] & 0x7F);
   }
@@ -136,6 +145,7 @@ void setup() {
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(0)
    ;
    
   cp5.addSlider("curPosCenter")
@@ -144,6 +154,7 @@ void setup() {
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(64)
    ;
    
   cp5.addSlider("curPosMax")
@@ -152,10 +163,13 @@ void setup() {
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(127)
    ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     int speakersPerCol = 17;
+    
+    pos[i] = 64;
     
     Slider s = cp5.addSlider("pos[" + i + "]")
      .setPosition(400 + (i/speakersPerCol)*250,10+(i%speakersPerCol)*35)
@@ -163,6 +177,7 @@ void setup() {
      .setRange(0,127)
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
+     .setValue(64)
      ;
 
     s.setValue(pos[i]);
