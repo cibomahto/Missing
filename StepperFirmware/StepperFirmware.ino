@@ -1,17 +1,17 @@
+#include <EEPROM.h>
+
 #include "defines.h"
 #include "PololuStepper.h"
 #include "RS485.h"
 #include "Protocol.h"
 #include "parameters.h"
 
-#include <EEPROM.h>
-
 const uint8_t movingCurrent        = 35;
 const uint8_t decelerationCurrent  = 35;
-const uint8_t holdingCurrent       = 25;
+const uint8_t holdingCurrent       = 35;
 
-const uint16_t minStepDelay        = 3800;
-const uint16_t maxStepDelay        = 10000;
+uint16_t minStepDelay        = 3800;
+uint16_t maxStepDelay        = 10000;
 uint16_t currentStepDelay;
 
 boolean currentDirection           = CLOCKWISE;
@@ -20,8 +20,8 @@ uint8_t stepDelayAcceleration      = 100;
 uint8_t stepDelayDeceleration      = 500;
 uint8_t decelerateOffset           = 15; ///< fudge factor, since we aren't doing real trapezoidal acceleration.
 
-const uint8_t stopHysteresis       = 2;  ///< How close we have to be from the target to stop moving
-const uint8_t startHysteresis      = 40;  ///< How far from the target we have to be to start moving
+uint8_t stopHysteresis       = 2;  ///< How close we have to be from the target to stop moving
+uint8_t startHysteresis      = 10;  ///< How far from the target we have to be to start moving
 boolean moving                     = false;
 
 int16_t targetPosition             = 512;
@@ -44,7 +44,9 @@ uint8_t noisePhase;
 void setup() {
   // Turn on the LED
   pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+//  digitalWrite(LED_PIN, HIGH);
+//  delay(2000);
+//  digitalWrite(LED_PIN, LOW);  
   
   initParameter();
 
@@ -85,7 +87,7 @@ void loop() {
 
   if(Serial.available()) {
     char a = Serial.read();
-    protocol.readByte(a, targetPosition);
+    protocol.readByte(a, targetPosition, minStepDelay, maxStepDelay, stopHysteresis, startHysteresis);
   }
 
 //************************************************************

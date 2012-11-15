@@ -12,8 +12,8 @@ void initParameter() {
       delay(300);
     }
     
-    writeUint8Parameter(PARAMETER_ADDRESS,      0xFF);
-    writeUint8Parameter(PARAMETER_REVERSED,     0x00);
+    writeUint8Parameter(PARAMETER_ADDRESS,      11);
+    writeUint8Parameter(PARAMETER_REVERSED,     0x01);
     writeUint8Parameter(PARAMETER_MAGIC_NUMBER, 0xBE);
   }
 }
@@ -26,3 +26,4 @@ void writeUint8Parameter(uint8_t address, uint8_t value) {
 uint8_t readUint8Parameter(uint8_t address) {
   return EEPROM.read(address);
 }
+
