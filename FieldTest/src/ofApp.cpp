@@ -47,6 +47,9 @@ void ofApp::setup() {
 	buildSpeakers();
 	
 	autorun = false;
+	
+	gui.setup();
+	gui.addSlider();
 }
 
 void ofApp::buildWires() {

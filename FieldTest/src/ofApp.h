@@ -6,7 +6,7 @@
 #include "ofxMidi.h"
 #include "ofxTiming.h"
 #include "ofxOsc.h"
-#include "ofxXmlSettings.h"
+#include "ofxAutoControlPanel.h"
 
 #include "DriverInterface.h"
 #include "Speaker.h"
@@ -26,6 +26,8 @@ public:
 	
 	void buildWires();
 	void buildSpeakers();
+	
+	ofxAutoControlPanel gui;
 	
 	bool autorun;
 	ofEasyCam cam;
