@@ -30,7 +30,7 @@
 		27373F79163A13DE00BC6864 /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27373F6E163A13DE00BC6864 /* Utilities.cpp */; };
 		27373F7A163A13DE00BC6864 /* Wrappers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27373F6F163A13DE00BC6864 /* Wrappers.cpp */; };
 		276C665516523FF600ADA83B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276C665216523FF600ADA83B /* main.cpp */; };
-		276C665616523FF600ADA83B /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276C665316523FF600ADA83B /* ofApp.cpp */; };
+		276C665616523FF600ADA83B /* MissingTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276C665316523FF600ADA83B /* MissingTracker.cpp */; };
 		27974FE1144D1A5A00BF8888 /* cameras.c in Sources */ = {isa = PBXBuildFile; fileRef = 27974FD5144D1A5A00BF8888 /* cameras.c */; };
 		27974FE2144D1A5A00BF8888 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 27974FD7144D1A5A00BF8888 /* core.c */; };
 		27974FE3144D1A5A00BF8888 /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = 27974FDC144D1A5A00BF8888 /* registration.c */; };
@@ -181,8 +181,8 @@
 		276C665016523FF600ADA83B /* KinectFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KinectFilter.h; path = src/KinectFilter.h; sourceTree = SOURCE_ROOT; };
 		276C665116523FF600ADA83B /* KinectTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KinectTracker.h; path = src/KinectTracker.h; sourceTree = SOURCE_ROOT; };
 		276C665216523FF600ADA83B /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
-		276C665316523FF600ADA83B /* ofApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofApp.cpp; path = src/ofApp.cpp; sourceTree = SOURCE_ROOT; };
-		276C665416523FF600ADA83B /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
+		276C665316523FF600ADA83B /* MissingTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MissingTracker.cpp; sourceTree = "<group>"; };
+		276C665416523FF600ADA83B /* MissingTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MissingTracker.h; sourceTree = "<group>"; };
 		27974FD5144D1A5A00BF8888 /* cameras.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cameras.c; path = ../../../addons/ofxKinect/libs/libfreenect/cameras.c; sourceTree = SOURCE_ROOT; };
 		27974FD6144D1A5A00BF8888 /* cameras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cameras.h; path = ../../../addons/ofxKinect/libs/libfreenect/cameras.h; sourceTree = SOURCE_ROOT; };
 		27974FD7144D1A5A00BF8888 /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../../../addons/ofxKinect/libs/libfreenect/core.c; sourceTree = SOURCE_ROOT; };
@@ -2218,8 +2218,8 @@
 				276C665016523FF600ADA83B /* KinectFilter.h */,
 				276C665116523FF600ADA83B /* KinectTracker.h */,
 				276C665216523FF600ADA83B /* main.cpp */,
-				276C665316523FF600ADA83B /* ofApp.cpp */,
-				276C665416523FF600ADA83B /* ofApp.h */,
+				276C665316523FF600ADA83B /* MissingTracker.cpp */,
+				276C665416523FF600ADA83B /* MissingTracker.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -2386,7 +2386,7 @@
 				2726A0371650BB9700BBE891 /* ofxOscReceiver.cpp in Sources */,
 				2726A0381650BB9700BBE891 /* ofxOscSender.cpp in Sources */,
 				276C665516523FF600ADA83B /* main.cpp in Sources */,
-				276C665616523FF600ADA83B /* ofApp.cpp in Sources */,
+				276C665616523FF600ADA83B /* MissingTracker.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

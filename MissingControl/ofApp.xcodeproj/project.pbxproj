@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		272BD524164CFA270047E7EB /* ofxAssimpModelLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 272BD4F7164CFA270047E7EB /* ofxAssimpModelLoader.cpp */; };
-		2768D395164CFA5800A990A6 /* ofApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2768D393164CFA5800A990A6 /* ofApp.cpp */; };
+		2768D395164CFA5800A990A6 /* MissingControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2768D393164CFA5800A990A6 /* MissingControl.cpp */; };
 		2778D4061654ABA7007DA93F /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2778D3FF1654ABA7007DA93F /* tinyxml.cpp */; };
 		2778D4071654ABA7007DA93F /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2778D4011654ABA7007DA93F /* tinyxmlerror.cpp */; };
 		2778D4081654ABA7007DA93F /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2778D4021654ABA7007DA93F /* tinyxmlparser.cpp */; };
@@ -151,8 +151,8 @@
 		272BD517164CFA270047E7EB /* LogStream.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = LogStream.h; path = ../../../addons/ofxAssimpModelLoader/libs/assimp/include/LogStream.h; sourceTree = SOURCE_ROOT; };
 		272BD518164CFA270047E7EB /* NullLogger.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = NullLogger.h; path = ../../../addons/ofxAssimpModelLoader/libs/assimp/include/NullLogger.h; sourceTree = SOURCE_ROOT; };
 		272BD519164CFA270047E7EB /* ProgressHandler.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ProgressHandler.h; path = ../../../addons/ofxAssimpModelLoader/libs/assimp/include/ProgressHandler.h; sourceTree = SOURCE_ROOT; };
-		2768D393164CFA5800A990A6 /* ofApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofApp.cpp; path = src/ofApp.cpp; sourceTree = SOURCE_ROOT; };
-		2768D394164CFA5800A990A6 /* ofApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofApp.h; path = src/ofApp.h; sourceTree = SOURCE_ROOT; };
+		2768D393164CFA5800A990A6 /* MissingControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MissingControl.cpp; sourceTree = "<group>"; };
+		2768D394164CFA5800A990A6 /* MissingControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MissingControl.h; sourceTree = "<group>"; };
 		2778D3FF1654ABA7007DA93F /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxml.cpp; path = ../../../addons/ofxXmlSettings/libs/tinyxml.cpp; sourceTree = SOURCE_ROOT; };
 		2778D4001654ABA7007DA93F /* tinyxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinyxml.h; path = ../../../addons/ofxXmlSettings/libs/tinyxml.h; sourceTree = SOURCE_ROOT; };
 		2778D4011654ABA7007DA93F /* tinyxmlerror.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tinyxmlerror.cpp; path = ../../../addons/ofxXmlSettings/libs/tinyxmlerror.cpp; sourceTree = SOURCE_ROOT; };
@@ -1895,8 +1895,8 @@
 				2785153F164F4286000AF510 /* Speaker.cpp */,
 				27851540164F4286000AF510 /* Speaker.h */,
 				C1DA593B164EF14400B4F2CF /* DriverInterface.h */,
-				2768D393164CFA5800A990A6 /* ofApp.cpp */,
-				2768D394164CFA5800A990A6 /* ofApp.h */,
+				2768D393164CFA5800A990A6 /* MissingControl.cpp */,
+				2768D394164CFA5800A990A6 /* MissingControl.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 			);
 			path = src;
@@ -1996,7 +1996,7 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				272BD524164CFA270047E7EB /* ofxAssimpModelLoader.cpp in Sources */,
-				2768D395164CFA5800A990A6 /* ofApp.cpp in Sources */,
+				2768D395164CFA5800A990A6 /* MissingControl.cpp in Sources */,
 				27851541164F4286000AF510 /* Speaker.cpp in Sources */,
 				2785189D16503AED000AF510 /* ofxRtMidiIn.cpp in Sources */,
 				2785189E16503AED000AF510 /* ofxRtMidiOut.cpp in Sources */,
