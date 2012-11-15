@@ -21,3 +21,4 @@ void writeUint8Parameter(uint8_t address, uint8_t value);
 uint8_t readUint8Parameter(uint8_t address);
 
 #endif
+

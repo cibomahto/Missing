@@ -20,7 +20,7 @@ void Protocol::reset() {
   m_mode = MODE_NOPACKET;
 }
 
-void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
+void Protocol::readByte(uint8_t data, int16_t& targetPosition, uint16_t& minStepDelay, uint16_t& maxStepDelay, uint8_t& stopHysteresis, uint8_t& startHysteresis) {
   if(data & 0x80) {
     // Reset the mode, no matter what
     switch(data) {
@@ -28,29 +28,29 @@ void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
         reset();
         
         m_mode = MODE_UPDATETARGET;
-        m_expectedLength = MAX_ADDRESS + 3;
+        m_expectedLength = MAX_ADDRESS + 7; // 1 header, 2 speeds, 2 historesis, 2 crc
         m_packetData[m_packetLength] = data;
         m_packetLength +=1;
         updateCRC(data);
         break;
         
-      case MODE_SETADDRESS:
-        reset();
-        m_mode = MODE_SETADDRESS;
-        m_expectedLength = 1 + 3;
-        m_packetData[m_packetLength] = data;
-        m_packetLength +=1;
-        updateCRC(data);
-        break;
-        
-      case MODE_SETREVERSED:
-        reset();
-        m_mode = MODE_SETREVERSED;
-        m_expectedLength = 2 + 3;
-        m_packetData[m_packetLength] = data;
-        m_packetLength +=1;
-        updateCRC(data);
-        break;
+//      case MODE_SETADDRESS:
+//        reset();
+//        m_mode = MODE_SETADDRESS;
+//        m_expectedLength = 1 + 3;
+//        m_packetData[m_packetLength] = data;
+//        m_packetLength +=1;
+//        updateCRC(data);
+//        break;
+//        
+//      case MODE_SETREVERSED:
+//        reset();
+//        m_mode = MODE_SETREVERSED;
+//        m_expectedLength = 2 + 3;
+//        m_packetData[m_packetLength] = data;
+//        m_packetLength +=1;
+//        updateCRC(data);
+//        break;
         
       default:
         reset(); 
@@ -74,19 +74,23 @@ void Protocol::readByte(uint8_t data, int16_t& targetPosition) {
       
       switch(m_mode) {
         case MODE_UPDATETARGET:
-          targetPosition = map(m_packetData[m_address+1], 0, 127, MIN_POSITION, MAX_POSITION);
+          minStepDelay = m_packetData[1]*100;
+          maxStepDelay = m_packetData[2]*100;
+          stopHysteresis = m_packetData[3];
+          startHysteresis = m_packetData[4];
+          targetPosition = map(m_packetData[m_address+5], 0, 127, MIN_POSITION, MAX_POSITION);
           break;
           
-        case MODE_SETADDRESS:
-          writeUint8Parameter(PARAMETER_ADDRESS, m_packetData[1]);
-          m_address = m_packetData[1];
-          break;
-          
-        case MODE_SETREVERSED:
-          if(m_packetData[1] == m_address) {
-            writeUint8Parameter(PARAMETER_REVERSED, m_packetData[2]==1);
-          }
-          break;
+//        case MODE_SETADDRESS:
+//          writeUint8Parameter(PARAMETER_ADDRESS, m_packetData[1]);
+//          m_address = m_packetData[1];
+//          break;
+//          
+//        case MODE_SETREVERSED:
+//          if(m_packetData[1] == m_address) {
+//            writeUint8Parameter(PARAMETER_REVERSED, m_packetData[2]==1);
+//          }
+//          break;
       }
       
       reset();

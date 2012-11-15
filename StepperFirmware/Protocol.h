@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define MAX_ADDRESS         50
-#define MAX_PACKETLENGTH    MAX_ADDRESS + 3
+#define MAX_PACKETLENGTH    MAX_ADDRESS + 20
 
 #define MODE_NOPACKET       0x0      ///< Waiting for a high bit to start a packet
 #define MODE_SETADDRESS     0x81     ///< Broadcast: Set the address for any attached device (payload length: 1)
@@ -36,7 +36,8 @@ public:
   // Read a byte into the packet processor, and handle it as possible.
   // @param data Data byte to read in
   // @param targetPosition (HACK) new target position.
-  void readByte(uint8_t data, int16_t& targetPosition);
+  void readByte(uint8_t data, int16_t& targetPosition, uint16_t& minStepDelay, uint16_t& maxStepDelay, uint8_t& stopHysteresis, uint8_t& startHysteresis);
 };
 
 #endif
+
