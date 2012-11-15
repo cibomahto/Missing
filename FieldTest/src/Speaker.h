@@ -13,13 +13,20 @@ protected:
 	ofMesh wires;
 	string label;
 	
-	float prevAngle, currentAngle, smoothAngle, actualAngle;  
+	int posMin, posCenter, posMax;
+	
+	float prevAngle, currentAngle, smoothAngle, actualAngle;
+	int remapped;
   bool prevMoving, moving;
 	
 public:
 	static void setupMesh();
-	void setup(ofVec3f position, ofMesh& wires);
+	void setup(ofVec3f position, ofMesh& wires, int posMin, int posCenter, int posMax);
 	void draw(bool showLabel);
 	void update(vector<ofVec2f>& listeners);
-	float getAngle();
+	void setRemapped(int remapped);
+	float getAngle() const;
+	float getPosMin() const;
+	float getPosCenter() const;
+	float getPosMax() const;
 };

@@ -32,8 +32,11 @@ float smoothRate = .1;
 float actualSmoothRate = .1;
 float maxSpeed = .5;
 
-void Speaker::setup(ofVec3f position, ofMesh& wiresCloud) {
+void Speaker::setup(ofVec3f position, ofMesh& wiresCloud, int posMin, int posCenter, int posMax) {
 	this->position = position;
+	this->posMin = posMin;
+	this->posCenter = posCenter;
+	this->posMax = posMax;
 	float crimpPosition = position.z + mountOffset;
 	label = ofToString(count++) + "/" + ofToString((int) millimetersToInches(crimpPosition)) + "in";
 	
@@ -61,7 +64,7 @@ void drawAngle(float angle, ofColor color) {
 	ofPushMatrix();
 	ofPushStyle();
 	ofSetColor(color);
-	ofRotateZ(angle);
+	ofRotateZ(-angle);
 	ofLine(ofVec2f(0, 0), play3Orientation * feetToMillimeters(1));
 	ofPopStyle();
 	ofPopMatrix();
@@ -94,15 +97,32 @@ void Speaker::draw(bool showLabel) {
 	drawAngle(smoothAngle, ofColor::fromHex(0x00abec));
 	drawAngle(currentAngle, ofColor::fromHex(0xec008c));
 	
-	ofRotateZ(actualAngle);
+	ofRotateZ(-actualAngle);
 	play3.draw();
 
 	ofPopMatrix();
 }
 
-float Speaker::getAngle() {
-	return actualAngle;
+void Speaker::setRemapped(int remapped) {
+	this->remapped = remapped;
 }
+
+float Speaker::getAngle() const {
+	return currentAngle;
+}
+
+float Speaker::getPosMin() const {
+	return posMin;
+}
+
+float Speaker::getPosCenter() const {
+	return posCenter;
+}
+
+float Speaker::getPosMax() const {
+	return posMax;
+}
+
 
 ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
 	float minimum;
@@ -120,7 +140,7 @@ ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
 void Speaker::update(vector<ofVec2f>& listeners) {
 	ofVec2f closest = getClosestPoint(listeners, position);
 	ofVec2f actual = closest - position;
-	float realAngle = orientation.angle(actual);
+	float realAngle = actual.angle(orientation);
 	
 	if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
 		(prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {

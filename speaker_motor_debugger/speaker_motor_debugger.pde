@@ -8,20 +8,65 @@ String VERSION_STRING = "1.0";
 
 int NUMBER_OF_SPEAKERS = 50;   // Number of attached speakers
 
-
-Boolean sendPositions = false;
-Boolean rangeTest = false;
-Boolean randomMotion = false;
+boolean sendPositions = false;
+boolean rangeTest = false;
+boolean randomMotion = false;
 
 int[] pos;                     // Speaker positions to send
+int[] posMin, posCenter, posMax;
+
+int configMaxSpeed = 38;
+int configMinSpeed = 100;
+int configStop = 2;
+int configStart = 10;
 
 int address = 0;
-Boolean enableAddressProgram = false;
+boolean enableAddressProgram = false;
 
-Boolean Reversed = false;
+boolean Reversed = false;
+
+void centerTest() {
+  for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+    pos[i] = 64;
+  }
+}
+
+void curPosMin(int curPosMin) {
+  posMin[address] = curPosMin;
+  pos[address] = curPosMin;
+}
+
+void curPosCenter(int curPosCenter) {
+  posCenter[address] = curPosCenter;
+  pos[address] = curPosCenter;
+}
+
+void curPosMax(int curPosMax) {
+  posMax[address] = curPosMax;
+  pos[address] = curPosMax;
+}
+
+void exportCalibration() {
+  PrintWriter output = createWriter("calibration.xml");
+  for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
+    output.println(
+      "<speaker>" +
+      "<id>" + i + "</id>" +
+      "<posMin>" + posMin[i] + "</posMin>" +
+      "<posCenter>" + posCenter[i] + "</posCenter>" +
+      "<posMax>" + posMax[i] + "</posMax>" +
+      "</speaker>");
+  }
+  output.flush();
+  output.close();
+}
 
 void sendPositionData() {
-  outPort.write(0xFE);
+  outPort.write(0xfe);
+  outPort.write(configMaxSpeed); // max speed
+  outPort.write(configMinSpeed); // min speed
+  outPort.write(configStop); // stop
+  outPort.write(configStart); // start
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     outPort.write(pos[i] & 0x7F);
   }
@@ -31,11 +76,13 @@ void sendPositionData() {
 }
 
 void sendSetAddress() {
-  outPort.write(0x81);
-  outPort.write(address);
-  
-  outPort.write(0); // TODO: CRC
-  outPort.write(0);
+  if(enableAddressProgram) {
+    outPort.write(0x81);
+    outPort.write(address);
+    
+    outPort.write(0); // TODO: CRC
+    outPort.write(0);
+  }
 }
 
 void sendSetReversed() {
@@ -52,6 +99,9 @@ void setup() {
   cp5 = new ControlP5(this);
   
   pos = new int[NUMBER_OF_SPEAKERS];
+  posMin = new int[NUMBER_OF_SPEAKERS];
+  posCenter = new int[NUMBER_OF_SPEAKERS];
+  posMax = new int[NUMBER_OF_SPEAKERS];
   
   String portName = "";
   
@@ -80,6 +130,41 @@ void setup() {
   cp5.addToggle("randomMotion")
    .setPosition(210,10)
    ;
+   
+  cp5.addButton("centerTest")
+   .setPosition(10,60);
+   ;
+   
+  cp5.addButton("exportCalibration")
+   .setPosition(10,220);
+   ;
+   
+  cp5.addSlider("curPosMin", 0, 0)
+   .setPosition(10, 250)
+   .setSize(256, 15)
+   .setRange(0, 127)
+   .setSliderMode(Slider.FLEXIBLE)
+   .setDecimalPrecision(1)
+   .setValue(0)
+   ;
+   
+  cp5.addSlider("curPosCenter")
+   .setPosition(10, 270)
+   .setSize(256, 15)
+   .setRange(0, 127)
+   .setSliderMode(Slider.FLEXIBLE)
+   .setDecimalPrecision(1)
+   .setValue(64)
+   ;
+   
+  cp5.addSlider("curPosMax")
+   .setPosition(10, 290)
+   .setSize(256, 15)
+   .setRange(0, 127)
+   .setSliderMode(Slider.FLEXIBLE)
+   .setDecimalPrecision(1)
+   .setValue(127)
+   ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     int speakersPerCol = 17;
@@ -89,6 +174,7 @@ void setup() {
      .setSize(180,30)
      .setRange(0,127)
      .setSliderMode(Slider.FLEXIBLE)
+     .setDecimalPrecision(1)
      ;
 
     s.setValue(pos[i]);
@@ -99,7 +185,7 @@ void setup() {
    
   Slider s = cp5.addSlider("address")
    .setPosition(10,350)
-   .setSize(180,30)
+   .setSize(256,30)
    .setRange(0,49)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
@@ -110,7 +196,7 @@ void setup() {
    .setPosition(10,400)
    ;
   
-  cp5.addBang("Store address")
+  cp5.addBang("sendSetAddress")
    .setPosition(140, 400)
    ;
 
@@ -119,7 +205,7 @@ void setup() {
    .setPosition(10,450)
    ;
   
-  cp5.addBang("Store reversed")
+  cp5.addBang("sendSetReversed")
    .setPosition(140, 450)
    ;
 
@@ -188,41 +274,7 @@ void draw() {
 }
 
 void controlEvent(ControlEvent theEvent) {
-  if (theEvent.isController()) {
-    // Program Address
-    if (theEvent.controller().name().startsWith("enableAddressProgram")) {
-      enableAddressProgram = theEvent.value() == 1;
-    }    
-    
-    if (theEvent.controller().name().startsWith("Store address")) {
-      if(enableAddressProgram) {
-        sendSetAddress();
-      } 
-    }
-    
-    // Reversed setting
-    if (theEvent.controller().name().startsWith("Reversed")) {
-      Reversed = theEvent.value() == 1;
-    }    
-    
-    if (theEvent.controller().name().startsWith("Store reversed")) {
-      sendSetReversed();
-    }
-    
-    
-    // Position
-    if (theEvent.controller().name().startsWith("sendPositions")) {
-      sendPositions = theEvent.value() == 1;
-    }
-
-    if (theEvent.controller().name().startsWith("rangeTest")) {
-      rangeTest = theEvent.value() == 1;
-    }
-
-    if (theEvent.controller().name().startsWith("randomMotion")) {
-      randomMotion = theEvent.value() == 1;
-    }
-    
+  if (theEvent.isController()) {    
     // check if theEvent is coming from a position controller
     if (theEvent.controller().name().startsWith("pos")) {
       // get the id of the controller and map the value

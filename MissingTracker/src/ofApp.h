@@ -1,6 +1,5 @@
 /*
  * do background thresholding with mm, don't display bg image
- * add iir to presence image
  */
 
 #pragma once
