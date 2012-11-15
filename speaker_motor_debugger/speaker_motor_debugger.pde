@@ -130,12 +130,13 @@ void setup() {
    .setPosition(10,220);
    ;
    
-  cp5.addSlider("curPosMin")
+  cp5.addSlider("curPosMin", 0, 0)
    .setPosition(10, 250)
    .setSize(256, 15)
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(0)
    ;
    
   cp5.addSlider("curPosCenter")
@@ -144,6 +145,7 @@ void setup() {
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(64)
    ;
    
   cp5.addSlider("curPosMax")
@@ -152,6 +154,7 @@ void setup() {
    .setRange(0, 127)
    .setSliderMode(Slider.FLEXIBLE)
    .setDecimalPrecision(1)
+   .setValue(127)
    ;
   
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
