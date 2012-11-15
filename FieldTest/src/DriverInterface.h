@@ -6,27 +6,43 @@
 class DriverInterface {
 public:
 	DriverInterface()
-	:connected(false) {
+	:connected(false)
+	,header(0xfe)
+	,configMaxSpeed(38)
+	,configMinSpeed(100)
+	,configStop(2)
+	,configStart(10)
+	,updateRate(0) {
 	}
 
 	void setup(string port, int baud) {
 		connected = serial.setup(port, baud);
 	}
+	void setUpdateRate(unsigned int updateRate) {
+		this->updateRate = updateRate;
+	}
+	void setConfigMaxSpeed(unsigned char configMaxSpeed) {
+		this->configMaxSpeed = safe(configMaxSpeed);
+	}
+	void setConfigMinSpeed(unsigned char configMinSpeed) {
+		this->configMinSpeed = safe(configMinSpeed);
+	}
+	void setConfigStop(unsigned char configStop) {
+		this->configStop = safe(configStop);
+	}
+	void setConfigStart(unsigned char configStart) {
+		this->configStart = safe(configStart);
+	}
 	void update(vector<Speaker>& speakers) {
 		static unsigned int counter = 0;
 		counter++;
-		if(counter % 2 != 0) return;
-		//cout << "serial at " << ofGetElapsedTimef() << endl;
+		if(updateRate > 0 && counter % updateRate != 0) {
+			return;
+		}
 		
 		packet.clear();
 		
 		// write the header
-		const unsigned char
-			header = 0xfe,
-			configMaxSpeed = 38,
-			configMinSpeed = 100,
-			configStop = 2,
-			configStart = 10;
 		packet.push_back(header);
 		packet.push_back(configMaxSpeed);
 		packet.push_back(configMinSpeed);
@@ -46,7 +62,7 @@ public:
 		
 		// make remapped values safe
 		for(int i = 0; i < remapped.size(); i++) {
-			remapped[i] &= ~(1<<7);
+			remapped[i] = safe(remapped[i]);
 		}
 		packet.insert(packet.end(), remapped.begin(), remapped.end());
 		
@@ -68,6 +84,20 @@ protected:
 	ofSerial serial;
 	bool connected;
 	vector<unsigned char> packet;
+
+	unsigned char
+		header,
+		configMaxSpeed,
+		configMinSpeed,
+		configStop,
+		configStart;
+		
+	unsigned int updateRate;
+		
+	static unsigned char safe(unsigned char byte) {
+		byte &= ~(1<<7);
+		return byte;
+	}
 	
 	static unsigned char getCrc(vector<unsigned char>& data) {
 		uint8_t crc = 0;
