@@ -21,7 +21,7 @@ void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofEnableAlphaBlending();
 	
-	driver.setup("tty", 9600);
+	driver.setup("tty.usbserial-A100S0L9", 57600);
 	driver.setDeadZone(10);
 	
 	MiniFont::setup();
@@ -80,6 +80,8 @@ void ofApp::update() {
 			oscListeners.clear();
 			for(int i = 0; i < n; i++) {
 				ofVec2f cur(msg.getArgAsFloat(2 * i), msg.getArgAsFloat(2 * i + 1));
+				cur.rotate(+90);
+				cur.y *= -1;
 				oscListeners.push_back(cur);
 			}
 		}

@@ -20,7 +20,7 @@ public:
 		packet.push_back(header);
 		
 		// write the remapped values
-		const int minValue = 0, maxValue = 127;
+		const int minValue = 127, maxValue = 0;
 		const float minAngle = -180 + deadAngle, maxAngle = +180 - deadAngle;
 		vector<unsigned char> remapped(angles.size());
 		for(int i = 0; i < angles.size(); i++) {
