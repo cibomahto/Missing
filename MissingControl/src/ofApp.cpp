@@ -19,7 +19,6 @@ float perspectiveScale = .15;
 void ofApp::setup() {
 	ofSetVerticalSync(true);
 	//ofSetLogLevel(OF_LOG_VERBOSE);
-	ofEnableAlphaBlending();
 	
 	driver.setup("tty.usbserial-A100S0L9", 57600);
 	
@@ -47,6 +46,26 @@ void ofApp::setup() {
 	buildSpeakers();
 	
 	autorun = false;
+	
+	gui.setup(280, 400);
+	gui.addPanel("Config");
+	gui.addSlider("updateRate", 0, 0, 30, true);
+	gui.addSlider("configMaxSpeed", 38, 1, 127, true);
+	gui.addSlider("configMinSpeed", 100, 1, 127, true);
+	gui.addSlider("configStop", 2, 1, 127, true);
+	gui.addSlider("configStart", 10, 1, 127, true);
+	
+	gui.addPanel("Visual");
+	gui.addSlider("rotationSpeed", 2, 0, 10);
+	gui.addSlider("perspectiveScale", .15, 0, 1);
+	
+	gui.addPanel("Sound");
+	gui.addSlider("volumeDelayLength", .5, 0, 5);
+	gui.addSlider("volumeFadeLength", 3, 0, 5);
+	
+	gui.loadSettings("settings.xml");
+	
+	gui.hide();
 }
 
 void ofApp::buildWires() {
@@ -77,6 +96,15 @@ void ofApp::buildSpeakers() {
 }
 
 void ofApp::update() {
+	driver.setUpdateRate(gui.getValueF("updateRate"));
+	driver.setConfigMaxSpeed(gui.getValueF("configMaxSpeed"));
+	driver.setConfigMinSpeed(gui.getValueF("configMinSpeed"));
+	driver.setConfigStop(gui.getValueF("configStop"));
+	driver.setConfigStart(gui.getValueF("configStart"));
+	
+	rotationSpeed = gui.getValueF("rotationSpeed");
+	perspectiveScale = gui.getValueF("perspectiveScale");
+
 	while(osc.hasWaitingMessages()) {
 		ofxOscMessage msg;
 		osc.getNextMessage(&msg);
@@ -118,7 +146,9 @@ void ofApp::update() {
 	}
 	
 	rawPresence = !listeners.empty();
+	presence.setDelay(gui.getValueF("volumeDelayLength"));
 	presence.update(rawPresence);
+	volume.setLength(gui.getValueF("volumeFadeLength"));
 	volume.update(presence);
 	midi.sendControlChange(1, 1, 127 * volume.get());
 	
@@ -179,12 +209,15 @@ void ofApp::drawPerspective() {
 	cam.begin();
 	ofScale(perspectiveScale, perspectiveScale, perspectiveScale);
 	ofRotateX(-90);
-	//ofRotateZ(rotationSpeed * ofGetElapsedTimef());
+	ofRotateZ(rotationSpeed * ofGetElapsedTimef());
 	drawScene(true);
 	cam.end();
 }
 
 void ofApp::draw() {
+	ofPushStyle();
+	ofEnableAlphaBlending();
+	
 	ofBackground(0);
 	ofSetColor(255, 128);
 	
@@ -211,6 +244,8 @@ void ofApp::draw() {
 	ofLine(0, 4, volume.get(), 4);
 	ofPopStyle();
 	ofPopMatrix();
+	
+	ofPopStyle();
 }
 
 void ofApp::keyPressed(int key) {
