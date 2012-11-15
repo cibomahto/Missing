@@ -109,9 +109,12 @@ void ofApp::update() {
 	}
 	// a mouse-following listener if ' ' is pressed
 	if(ofGetKeyPressed(' ')) {
-		listeners.push_back(ofVec2f(
-			ofMap(mouseY, 0, ofGetHeight(), -stageSize / 2, stageSize / 2),
-			ofMap(mouseX, 0, ofGetWidth(), stageSize / 2, -stageSize / 2)));
+		ofVec2f cur;
+		cur.x = ofMap(mouseX, 0, ofGetWidth(), -stageSize / 2, stageSize / 2);
+		cur.y = ofMap(mouseY, 0, ofGetHeight(), -stageSize / 2, stageSize / 2);
+		cur.rotate(+90);
+		cur.y *= -1;
+		listeners.push_back(cur);
 	}
 	
 	rawPresence = !listeners.empty();
@@ -176,7 +179,7 @@ void ofApp::drawPerspective() {
 	cam.begin();
 	ofScale(perspectiveScale, perspectiveScale, perspectiveScale);
 	ofRotateX(-90);
-	ofRotateZ(rotationSpeed * ofGetElapsedTimef());
+	//ofRotateZ(rotationSpeed * ofGetElapsedTimef());
 	drawScene(true);
 	cam.end();
 }

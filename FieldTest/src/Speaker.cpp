@@ -64,7 +64,7 @@ void drawAngle(float angle, ofColor color) {
 	ofPushMatrix();
 	ofPushStyle();
 	ofSetColor(color);
-	ofRotateZ(angle);
+	ofRotateZ(-angle);
 	ofLine(ofVec2f(0, 0), play3Orientation * feetToMillimeters(1));
 	ofPopStyle();
 	ofPopMatrix();
@@ -97,10 +97,14 @@ void Speaker::draw(bool showLabel) {
 	drawAngle(smoothAngle, ofColor::fromHex(0x00abec));
 	drawAngle(currentAngle, ofColor::fromHex(0xec008c));
 	
-	ofRotateZ(actualAngle);
+	ofRotateZ(-actualAngle);
 	play3.draw();
 
 	ofPopMatrix();
+}
+
+void Speaker::setRemapped(int remapped) {
+	this->remapped = remapped;
 }
 
 float Speaker::getAngle() const {
@@ -136,7 +140,7 @@ ofVec2f getClosestPoint(vector<ofVec2f>& points, ofVec2f target) {
 void Speaker::update(vector<ofVec2f>& listeners) {
 	ofVec2f closest = getClosestPoint(listeners, position);
 	ofVec2f actual = closest - position;
-	float realAngle = orientation.angle(actual);
+	float realAngle = actual.angle(orientation);
 	
 	if((realAngle < -backwardsHysteresis && prevAngle > +backwardsHysteresis) ||
 		(prevAngle < -backwardsHysteresis && realAngle > +backwardsHysteresis)) {

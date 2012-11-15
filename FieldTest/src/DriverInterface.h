@@ -20,13 +20,19 @@ public:
 		packet.push_back(header);
 		
 		// write the remapped values
-		static const int unitsPerDegree = 71.75/90.;
+		static const float unitsPerDegree = 71.75/180.;
 		vector<unsigned char> remapped(speakers.size());
 		for(int i = 0; i < speakers.size(); i++) {
 			Speaker& cur = speakers[i];
 			float raw = cur.getAngle() * unitsPerDegree;
-			raw -= cur.getPosCenter();
+			raw += cur.getPosCenter();
 			remapped[i] = ofClamp(raw, cur.getPosMin(), cur.getPosMax());
+			cur.setRemapped(remapped[i]);
+		}
+		
+		// make remapped values safe
+		for(int i = 0; i < remapped.size(); i++) {
+			remapped[i] &= ~(1<<7);
 		}
 		packet.insert(packet.end(), remapped.begin(), remapped.end());
 		
