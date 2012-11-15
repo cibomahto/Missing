@@ -20,6 +20,13 @@ public:
 		packet.push_back(header);
 		
 		// write the remapped values
+<<<<<<< HEAD
+		const int minValue = 127, maxValue = 0;
+		const float minAngle = -180 + deadAngle, maxAngle = +180 - deadAngle;
+		vector<unsigned char> remapped(angles.size());
+		for(int i = 0; i < angles.size(); i++) {
+			remapped[i] = (unsigned char) ofMap(angles[i], minAngle, maxAngle, minValue, maxValue);
+=======
 		static const int unitsPerDegree = 71.75/90.;
 		vector<unsigned char> remapped(speakers.size());
 		for(int i = 0; i < speakers.size(); i++) {
@@ -27,6 +34,7 @@ public:
 			float raw = cur.getAngle() * unitsPerDegree;
 			raw -= cur.getPosCenter();
 			remapped[i] = ofClamp(raw, cur.getPosMin(), cur.getPosMax());
+>>>>>>> b467abe58921805ddfc2d86bd9123192832ffb4a
 		}
 		packet.insert(packet.end(), remapped.begin(), remapped.end());
 		

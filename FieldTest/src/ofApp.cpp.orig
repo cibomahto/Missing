@@ -21,7 +21,12 @@ void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofEnableAlphaBlending();
 	
+<<<<<<< HEAD
+	driver.setup("tty.usbserial-A100S0L9", 57600);
+	driver.setDeadZone(10);
+=======
 	driver.setup("tty", 9600);
+>>>>>>> b467abe58921805ddfc2d86bd9123192832ffb4a
 	
 	MiniFont::setup();
 	

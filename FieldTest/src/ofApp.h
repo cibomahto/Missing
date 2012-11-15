@@ -6,6 +6,7 @@
 #include "ofxMidi.h"
 #include "ofxTiming.h"
 #include "ofxOsc.h"
+#include "ofxXmlSettings.h"
 
 #include "DriverInterface.h"
 #include "Speaker.h"
