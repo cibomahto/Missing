@@ -16,8 +16,17 @@ public:
 		packet.clear();
 		
 		// write the header
-		const unsigned char header = 0xfe;
+		const unsigned char
+			header = 0xfe,
+			configMaxSpeed = 38,
+			configMinSpeed = 100,
+			configStop = 2,
+			configStart = 10;
 		packet.push_back(header);
+		packet.push_back(configMaxSpeed);
+		packet.push_back(configMinSpeed);
+		packet.push_back(configStop);
+		packet.push_back(configStart);
 		
 		// write the remapped values
 		static const float unitsPerDegree = 71.75/180.;

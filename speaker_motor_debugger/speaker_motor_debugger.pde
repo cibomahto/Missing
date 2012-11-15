@@ -15,6 +15,11 @@ boolean randomMotion = false;
 int[] pos;                     // Speaker positions to send
 int[] posMin, posCenter, posMax;
 
+int configMaxSpeed = 38;
+int configMinSpeed = 100;
+int configStop = 2;
+int configStart = 10;
+
 int address = 0;
 boolean enableAddressProgram = false;
 
@@ -57,7 +62,11 @@ void exportCalibration() {
 }
 
 void sendPositionData() {
-  outPort.write(0xFE);
+  outPort.write(0xfe);
+  outPort.write(configMaxSpeed); // max speed
+  outPort.write(configMinSpeed); // min speed
+  outPort.write(configStop); // stop
+  outPort.write(configStart); // start
   for(int i = 0; i < NUMBER_OF_SPEAKERS; i++) {
     outPort.write(pos[i] & 0x7F);
   }
