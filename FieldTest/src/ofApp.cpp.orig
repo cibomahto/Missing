@@ -18,10 +18,15 @@ float perspectiveScale = .15;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
-	//ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_VERBOSE);
 	ofEnableAlphaBlending();
 	
+<<<<<<< HEAD
 	driver.setup("tty.usbserial-A100S0L9", 57600);
+	driver.setDeadZone(10);
+=======
+	driver.setup("tty", 9600);
+>>>>>>> b467abe58921805ddfc2d86bd9123192832ffb4a
 	
 	MiniFont::setup();
 	
@@ -47,9 +52,6 @@ void ofApp::setup() {
 	buildSpeakers();
 	
 	autorun = false;
-	
-	gui.setup();
-	gui.addSlider();
 }
 
 void ofApp::buildWires() {
@@ -112,12 +114,9 @@ void ofApp::update() {
 	}
 	// a mouse-following listener if ' ' is pressed
 	if(ofGetKeyPressed(' ')) {
-		ofVec2f cur;
-		cur.x = ofMap(mouseX, 0, ofGetWidth(), -stageSize / 2, stageSize / 2);
-		cur.y = ofMap(mouseY, 0, ofGetHeight(), -stageSize / 2, stageSize / 2);
-		cur.rotate(+90);
-		cur.y *= -1;
-		listeners.push_back(cur);
+		listeners.push_back(ofVec2f(
+			ofMap(mouseY, 0, ofGetHeight(), -stageSize / 2, stageSize / 2),
+			ofMap(mouseX, 0, ofGetWidth(), stageSize / 2, -stageSize / 2)));
 	}
 	
 	rawPresence = !listeners.empty();
@@ -182,7 +181,7 @@ void ofApp::drawPerspective() {
 	cam.begin();
 	ofScale(perspectiveScale, perspectiveScale, perspectiveScale);
 	ofRotateX(-90);
-	//ofRotateZ(rotationSpeed * ofGetElapsedTimef());
+	ofRotateZ(rotationSpeed * ofGetElapsedTimef());
 	drawScene(true);
 	cam.end();
 }

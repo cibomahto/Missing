@@ -15,7 +15,8 @@ protected:
 	
 	int posMin, posCenter, posMax;
 	
-	float prevAngle, currentAngle, smoothAngle, actualAngle;  
+	float prevAngle, currentAngle, smoothAngle, actualAngle;
+	int remapped;
   bool prevMoving, moving;
 	
 public:
@@ -23,6 +24,7 @@ public:
 	void setup(ofVec3f position, ofMesh& wires, int posMin, int posCenter, int posMax);
 	void draw(bool showLabel);
 	void update(vector<ofVec2f>& listeners);
+	void setRemapped(int remapped);
 	float getAngle() const;
 	float getPosMin() const;
 	float getPosCenter() const;
