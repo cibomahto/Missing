@@ -108,7 +108,7 @@ void Speaker::setRemapped(int remapped) {
 }
 
 float Speaker::getAngle() const {
-	return actualAngle;
+	return currentAngle;
 }
 
 float Speaker::getPosMin() const {

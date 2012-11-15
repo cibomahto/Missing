@@ -13,6 +13,11 @@ public:
 		connected = serial.setup(port, baud);
 	}
 	void update(vector<Speaker>& speakers) {
+		static unsigned int counter = 0;
+		counter++;
+		if(counter % 2 != 0) return;
+		//cout << "serial at " << ofGetElapsedTimef() << endl;
+		
 		packet.clear();
 		
 		// write the header

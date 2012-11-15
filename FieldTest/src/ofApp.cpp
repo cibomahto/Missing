@@ -18,7 +18,7 @@ float perspectiveScale = .15;
 
 void ofApp::setup() {
 	ofSetVerticalSync(true);
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
 	ofEnableAlphaBlending();
 	
 	driver.setup("tty.usbserial-A100S0L9", 57600);
