@@ -28,6 +28,8 @@ public:
 	void updateControl();
 	void drawControl();
 	
+	void startAbleton();
+	
 	void drawScene(bool showLabels);
 	void drawPlan(float x, float y, float side);
 	void drawSection(float x, float y, float side);
@@ -58,7 +60,7 @@ public:
 	ofxMidiOut midi;
 	
 	bool rawPresence;
-	Hysteresis presenceHysteresis;
+	Hysteresis presenceHysteresis, songStartHysteresis;
 	FadeTimer volume;
 	
 	bool enableMidi;

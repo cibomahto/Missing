@@ -1,11 +1,11 @@
 <calibrationTime>
-    <val_0>15.016666412</val_0>
+    <val_0>20.011110306</val_0>
 </calibrationTime>
 <calibrationProgress>
-    <val_0>1.000000000</val_0>
+    <val_0>0.416269004</val_0>
 </calibrationProgress>
 <calibrate>
-    <val_0>0.000000000</val_0>
+    <val_0>1.000000000</val_0>
 </calibrate>
 <showCloud>
     <val_0>1.000000000</val_0>
@@ -98,5 +98,20 @@
     <val_0>1.000000000</val_0>
 </enableKinect>
 <calibrationDelay>
-    <val_0>15.000000000</val_0>
+    <val_0>10.000000000</val_0>
 </calibrationDelay>
+<volumePlay3>
+    <val_0>0.594444454</val_0>
+</volumePlay3>
+<volumeSub>
+    <val_0>0.500000000</val_0>
+</volumeSub>
+<volumeFadeIn>
+    <val_0>1.000000000</val_0>
+</volumeFadeIn>
+<volumeFadeOut>
+    <val_0>8.000000000</val_0>
+</volumeFadeOut>
+<songRestartDelay>
+    <val_0>15.000000000</val_0>
+</songRestartDelay>

@@ -9,6 +9,14 @@ const string kinectSerialSw = "A00363A04112112A";
 const string kinectSerialNe = "A00362913019109A";
 const int gridSize = 1024;
 
+template <class T>
+void clearImage(ofImage_<T>& img) {
+	int n = img.getWidth() * img.getHeight();
+	for(int i = 0; i < n; i++) {
+		img.getPixels()[i] = 0;
+	}
+}
+
 void drawChunkyCloud(ofMesh& mesh, ofColor color, int innerRadius = 1, int outerRadius = 3) {
 	ofPushStyle();
 	ofSetColor(0);
@@ -37,8 +45,12 @@ void MissingApp::setupControlPanel() {
 	gui.addSlider("perspectiveScale", .15, 0, 1);
 	
 	gui.addPanel("Sound");
+	gui.addSlider("songRestartDelay", 15, 0, 30);
+	gui.addSlider("volumePlay3", 1, 0, 1);
+	gui.addSlider("volumeSub", 1, 0, 1);
 	gui.addSlider("volumeDelayLength", .5, 0, 5);
-	gui.addSlider("volumeFadeLength", 3, 0, 5);
+	gui.addSlider("volumeFadeIn", 1, 0, 10);
+	gui.addSlider("volumeFadeOut", 8, 0, 10);
 	
 	gui.addPanel("Analysis");
 	gui.addToggle("enableKinect", false);
@@ -77,6 +89,7 @@ void MissingApp::setupControlPanel() {
 
 void MissingApp::setup() {
 	ofSetVerticalSync(true);
+	ofSetFrameRate(120);
 	enableMidi = true;
 	setupControlPanel();
 	setupTracker();
@@ -174,6 +187,12 @@ void MissingApp::buildSpeakers() {
 	}
 }
 
+void MissingApp::startAbleton() {
+	midi.sendNoteOn(1, 64);
+	ofSleepMillis(100);
+	midi.sendNoteOff(1, 64);
+}
+
 void MissingApp::updateControl() {
 	driver.setUpdateRate(gui.getValueF("updateRate"));
 	driver.setConfigMaxSpeed(gui.getValueF("configMaxSpeed"));
@@ -208,15 +227,22 @@ void MissingApp::updateControl() {
 		listeners.push_back(cur);
 	}
 	
-	rawPresence = !listeners.empty();
+	rawPresence = !listeners.empty() && !gui.getValueB("calibrate");
+	songStartHysteresis.setDelay(0, gui.getValueF("songRestartDelay"));
+	songStartHysteresis.update(rawPresence);
+	if(songStartHysteresis.wasTriggered()) {
+		startAbleton();
+	}
 	presenceHysteresis.setDelay(gui.getValueF("volumeDelayLength"));
-	presenceHysteresis.update(rawPresence);
-	volume.setLength(gui.getValueF("volumeFadeLength"));
+	presenceHysteresis.update(rawPresence);	
+	volume.setLength(gui.getValueF("volumeFadeIn"), gui.getValueF("volumeFadeOut"));
 	volume.update(presenceHysteresis);
 	if(enableMidi) {
-		midi.sendControlChange(1, 1, 127 * volume.get());
+		midi.sendControlChange(1, 1, 127 * volume.get() * gui.getValueF("volumePlay3"));
+		midi.sendControlChange(1, 2, 127 * volume.get() * gui.getValueF("volumeSub"));
 	} else {
 		midi.sendControlChange(1, 1, 0);
+		midi.sendControlChange(1, 2, 0);
 	}
 		
 	for(int i = 0; i < speakers.size(); i++) {
@@ -333,18 +359,25 @@ void MissingApp::updateTracker() {
 		connectedStart = curTime;
 	}
 
-	float calibrationProgress = curTime - calibrationStart;
+	float calibrationProgress;
 	float calibrationTime = gui.getValueF("calibrationTime");
-	if(calibrating) {
-		if(calibrationProgress > calibrationTime) {
-			calibrating = false;
-			gui.setValueF("calibrate", false);
-			gui.setValueF("calibrationProgress", 0);
+	if(curTime - connectedStart < gui.getValueF("calibrationDelay")) {
+		calibrationProgress = 0;
+	} else {
+		calibrationProgress = curTime - calibrationStart;
+		if(calibrating) {
+			if(calibrationProgress > calibrationTime) {
+				// stop calibration and start music
+				calibrating = false;
+				gui.setValueF("calibrate", false);
+				startAbleton();
+			}
+		} else if(gui.getValueF("calibrate")) {
+			// start calibration
+			calibrationStart = curTime;
+			calibrating = true;
+			clearBackground = true;
 		}
-	} else if(gui.getValueF("calibrate") && (curTime - connectedStart) > gui.getValueF("calibrationDelay")) {
-		calibrationStart = curTime;
-		calibrating = true;
-		clearBackground = true;
 	}
 	
 	gui.setValueF("calibrationProgress", calibrationProgress / calibrationTime);
@@ -384,12 +417,12 @@ void MissingApp::updateTracker() {
 		// this pattern should be abstracted into ofxCv at some point
 		if(presence.getWidth() != gridDivisions || presence.getHeight() != gridDivisions) {
 			presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
-			toCv(curPresence) = cv::Scalar(0);
+			clearImage(presence);
 		}
 		float* curPresencePixels = curPresence.getPixels();
 		int presenceArea = gridDivisions * gridDivisions;
 		// wanting to clear an image is a common operation, this technique very powerful but not well named:
-		toCv(curPresence) = cv::Scalar(0);
+		clearImage(curPresence);
 		int n = 640 * 480;
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
 		

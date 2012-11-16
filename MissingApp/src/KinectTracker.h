@@ -24,7 +24,7 @@ protected:
 public:	
 	KinectTracker()
 	:newFrame(false)
-	,clearBackground(false)
+	,clearBackground(true)
 	,calibrating(false)
 	,backgroundThreshold(0)
 	,rotation(0)
