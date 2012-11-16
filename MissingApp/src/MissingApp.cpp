@@ -82,6 +82,11 @@ void MissingApp::setup() {
 	setupControl();
 }
 void MissingApp::update() {
+	if(gui.hidden) {
+		ofHideCursor();
+	} else {
+		ofShowCursor();
+	}
 	updateTracker();
 	updateControl();
 }
@@ -415,7 +420,9 @@ void MissingApp::drawTracker() {
 		ofPushMatrix();
 		int gridDivisions = gui.getValueF("gridDivisions");
 		float gridScale = (float) gridSize / gridDivisions;
+		//ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
 		ofScale(gridScale, gridScale, gridScale);
+		//ofTranslate(-gridDivisions / 2, -gridDivisions / 2);
 		
 		presence.bind();
 		ofSetMinMagFilters(GL_NEAREST, GL_NEAREST);
