@@ -1,5 +1,5 @@
 <calibrationTime>
-    <val_0>5.000000000</val_0>
+    <val_0>15.016666412</val_0>
 </calibrationTime>
 <calibrationProgress>
     <val_0>1.000000000</val_0>
@@ -98,5 +98,5 @@
     <val_0>1.000000000</val_0>
 </enableKinect>
 <calibrationDelay>
-    <val_0>2.000000000</val_0>
+    <val_0>15.000000000</val_0>
 </calibrationDelay>

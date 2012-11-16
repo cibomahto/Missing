@@ -12,7 +12,7 @@ protected:
 		,curValue(false)
 		{
 		}
-		const bool& update(const bool& value, const unsigned int& curTime, const unsigned int& delay) {
+		const bool update(const bool& value, const unsigned int& curTime, const unsigned int& delay) {
 			if(value != curValue) {
 				lastTime = curTime;
 			}

@@ -42,8 +42,8 @@ void MissingApp::setupControlPanel() {
 	
 	gui.addPanel("Analysis");
 	gui.addToggle("enableKinect", false);
-	gui.addSlider("calibrationDelay", 2, 0, 10);
-	gui.addSlider("calibrationTime", 2, 1, 10);
+	gui.addSlider("calibrationDelay", 10, 0, 30);
+	gui.addSlider("calibrationTime", 15, 1, 30);
 	gui.addSlider("calibrationProgress", 0, 0, 1);
 	gui.addToggle("calibrate", true);
 	gui.addToggle("showCloud");
@@ -96,13 +96,24 @@ void MissingApp::draw() {
 	drawTracker();
 	drawControl();
 	
-	ofPushStyle();
-	ofSetColor(255);
 	if(!enableMidi) {
+		ofPushStyle();
+		ofSetColor(255);
+		ofSetLineWidth(3);
 		ofLine(0, 0, ofGetWidth(), ofGetHeight());
 		ofLine(ofGetWidth(), 0, 0, ofGetHeight());
+		ofPopStyle();
 	}
-	ofPopStyle();
+	
+	float calibrationProgress = gui.getValueF("calibrationProgress");
+	if(calibrationProgress < 1) {
+		ofPushStyle();
+		ofEnableAlphaBlending();
+		ofSetColor(255, 32);
+		ofFill();
+		ofRect(0, 0, ofGetWidth() * calibrationProgress, ofGetHeight());
+		ofPopStyle();
+	}
 }
 
 float stageSize = feetInchesToMillimeters(15, 8);
@@ -175,8 +186,8 @@ void MissingApp::updateControl() {
 
 	// start by copying the current osc listeners
 	listeners = realListeners;
-	// then add any autorun listeners
-	if(gui.getValueB("autorun")) {
+	// then add any autorun/calibration listeners
+	if(gui.getValueB("autorun") || gui.getValueB("calibrate")) {
 		ofVec2f planet;
 		float t = .05 * ofGetElapsedTimef();
 		planet.x = ofMap(ofNoise(t, 0), 0, 1, -stageSize, stageSize) / 2; 
@@ -297,6 +308,7 @@ void MissingApp::drawControl() {
 	ofLine(0, 2, presenceHysteresis.get(), 2);
 	ofSetColor(ofColor::fromHex(0xec008c));
 	ofLine(0, 4, volume.get(), 4);
+	ofSetColor(255);
 	ofPopStyle();
 	ofPopMatrix();
 	
@@ -311,14 +323,16 @@ void MissingApp::setupTracker() {
 }
 
 void MissingApp::updateTracker() {
+	float curTime = ofGetElapsedTimef();
+	
 	if(gui.getValueB("enableKinect") && !connected) {
 		kinectSw.setup(kinectSerialSw);
 		kinectNe.setup(kinectSerialNe);
+		gui.setValueB("calibrate", true);
 		connected = true;
-		ofResetElapsedTimeCounter();
+		connectedStart = curTime;
 	}
 
-	float curTime = ofGetElapsedTimef();
 	float calibrationProgress = curTime - calibrationStart;
 	float calibrationTime = gui.getValueF("calibrationTime");
 	if(calibrating) {
@@ -327,7 +341,7 @@ void MissingApp::updateTracker() {
 			gui.setValueF("calibrate", false);
 			gui.setValueF("calibrationProgress", 0);
 		}
-	} else if(gui.getValueF("calibrate")) {
+	} else if(gui.getValueF("calibrate") && (curTime - connectedStart) > gui.getValueF("calibrationDelay")) {
 		calibrationStart = curTime;
 		calibrating = true;
 		clearBackground = true;
@@ -367,11 +381,15 @@ void MissingApp::updateTracker() {
 		ofFloatImage curPresence;
 		curPresence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
 		imitate(presence, curPresence);
+		// this pattern should be abstracted into ofxCv at some point
+		if(presence.getWidth() != gridDivisions || presence.getHeight() != gridDivisions) {
+			presence.allocate(gridDivisions, gridDivisions, OF_IMAGE_GRAYSCALE);
+			toCv(curPresence) = cv::Scalar(0);
+		}
 		float* curPresencePixels = curPresence.getPixels();
 		int presenceArea = gridDivisions * gridDivisions;
-		for(int i = 0; i < presenceArea; i++) {
-			curPresencePixels[i] = 0;
-		}
+		// wanting to clear an image is a common operation, this technique very powerful but not well named:
+		toCv(curPresence) = cv::Scalar(0);
 		int n = 640 * 480;
 		float presenceScale = presenceArea / (float) (n * gui.getValueF("presenceScale"));
 		
@@ -443,6 +461,7 @@ void MissingApp::drawTracker() {
 		presence.draw(0, 0);
 		
 		ofPushStyle();
+		ofSetLineWidth(3);
 		ofSetColor(cyanPrint);
 		ofLine(gridDivisions / 2, 0, gridDivisions / 2, gridDivisions);
 		ofLine(0, gridDivisions / 2, gridDivisions, gridDivisions / 2);
@@ -475,7 +494,7 @@ void MissingApp::drawTracker() {
 		}
 	}
 	
-	if(ofGetKeyPressed(' ')) {
+	if(ofGetKeyPressed(' ') || gui.getValueB("calibrate")) {
 		vector<KinectTracker*> kinects;
 		kinects.push_back(&kinectSw);
 		kinects.push_back(&kinectNe);

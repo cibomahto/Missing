@@ -39,7 +39,7 @@ public:
 	ofxAutoControlPanel gui;
 	
 	bool connected, calibrating, clearBackground;
-	float calibrationStart;
+	float calibrationStart, connectedStart;
 	
 	KinectTracker kinectSw, kinectNe;
 	
