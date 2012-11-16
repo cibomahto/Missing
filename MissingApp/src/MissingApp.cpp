@@ -77,6 +77,7 @@ void MissingApp::setupControlPanel() {
 
 void MissingApp::setup() {
 	ofSetVerticalSync(true);
+	enableMidi = true;
 	setupControlPanel();
 	setupTracker();
 	setupControl();
@@ -94,6 +95,14 @@ void MissingApp::draw() {
 	ofBackground(0);
 	drawTracker();
 	drawControl();
+	
+	ofPushStyle();
+	ofSetColor(255);
+	if(!enableMidi) {
+		ofLine(0, 0, ofGetWidth(), ofGetHeight());
+		ofLine(ofGetWidth(), 0, 0, ofGetHeight());
+	}
+	ofPopStyle();
 }
 
 float stageSize = feetInchesToMillimeters(15, 8);
@@ -193,8 +202,12 @@ void MissingApp::updateControl() {
 	presenceHysteresis.update(rawPresence);
 	volume.setLength(gui.getValueF("volumeFadeLength"));
 	volume.update(presenceHysteresis);
-	midi.sendControlChange(1, 1, 127 * volume.get());
-	
+	if(enableMidi) {
+		midi.sendControlChange(1, 1, 127 * volume.get());
+	} else {
+		midi.sendControlChange(1, 1, 0);
+	}
+		
 	for(int i = 0; i < speakers.size(); i++) {
 		speakers[i].update(listeners);
 	}
@@ -477,5 +490,11 @@ void MissingApp::drawTracker() {
 			ofTranslate(320, 0);
 		}
 		ofPopMatrix();
+	}
+}
+
+void MissingApp::keyPressed(int key) {
+	if(key == 'e') {
+		enableMidi = !enableMidi;
 	}
 }

@@ -38,10 +38,10 @@
     <val_0>20.622222900</val_0>
 </thresholdSw>
 <gridOffsetXSw>
-    <val_0>-139.556152344</val_0>
+    <val_0>-177.777832031</val_0>
 </gridOffsetXSw>
 <gridOffsetYSw>
-    <val_0>3375.113769531</val_0>
+    <val_0>2933.333496094</val_0>
 </gridOffsetYSw>
 <rotationSw>
     <val_0>37.879943848</val_0>
@@ -50,10 +50,10 @@
     <val_0>20.622222900</val_0>
 </thresholdNe>
 <gridOffsetXNe>
-    <val_0>-177.777832031</val_0>
+    <val_0>-133.333496094</val_0>
 </gridOffsetXNe>
 <gridOffsetYNe>
-    <val_0>2666.666503906</val_0>
+    <val_0>3066.666503906</val_0>
 </gridOffsetYNe>
 <rotationNe>
     <val_0>-130.000000000</val_0>
@@ -97,3 +97,6 @@
 <enableKinect>
     <val_0>1.000000000</val_0>
 </enableKinect>
+<calibrationDelay>
+    <val_0>2.000000000</val_0>
+</calibrationDelay>

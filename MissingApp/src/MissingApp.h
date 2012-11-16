@@ -18,6 +18,7 @@ public:
 	void setup();
 	void update();
 	void draw();
+	void keyPressed(int key);
 	
 	void setupTracker();
 	void updateTracker();
@@ -59,4 +60,6 @@ public:
 	bool rawPresence;
 	Hysteresis presenceHysteresis;
 	FadeTimer volume;
+	
+	bool enableMidi;
 };
