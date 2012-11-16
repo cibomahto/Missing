@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-               BuildableName = "ofxKinectExample.app"
-               BlueprintName = "ofxKinectExample"
-               ReferencedContainer = "container:ofxKinectExample.xcodeproj">
+               BuildableName = "MissingApp.app"
+               BlueprintName = "MissingApp"
+               ReferencedContainer = "container:MissingApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "ofxKinectExample.app"
-            BlueprintName = "ofxKinectExample"
-            ReferencedContainer = "container:ofxKinectExample.xcodeproj">
+            BuildableName = "MissingApp.app"
+            BlueprintName = "MissingApp"
+            ReferencedContainer = "container:MissingApp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -44,7 +44,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
@@ -52,9 +52,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "ofxKinectExample.app"
-            BlueprintName = "ofxKinectExample"
-            ReferencedContainer = "container:ofxKinectExample.xcodeproj">
+            BuildableName = "MissingApp.app"
+            BlueprintName = "MissingApp"
+            ReferencedContainer = "container:MissingApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "ofxKinectExample.app"
-            BlueprintName = "ofxKinectExample"
-            ReferencedContainer = "container:ofxKinectExample.xcodeproj">
+            BuildableName = "MissingApp.app"
+            BlueprintName = "MissingApp"
+            ReferencedContainer = "container:MissingApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
