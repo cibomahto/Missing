@@ -1,0 +1,7 @@
+Power Distribution PCB
+By Matt Mets
+Copyright 2012
+License: GPL v3.0
+
+The Power Distribution PCB design is a derivative of the MakerBot Extruder Controller v3.6 (http://www.thingiverse.com/thing:4969), which is also GPL 3.0 licensed.
+
