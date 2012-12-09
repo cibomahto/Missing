@@ -1,4 +1,4 @@
-<speaker><id>0</id><posMin>0</posMin><posCenter>56</posCenter><posMax>110</posMax></speaker>
+<speaker><id>0</id><posMin>20</posMin><posCenter>56</posCenter><posMax>110</posMax></speaker>
 <speaker><id>1</id><posMin>0</posMin><posCenter>56</posCenter><posMax>119</posMax></speaker>
 <speaker><id>2</id><posMin>0</posMin><posCenter>58</posCenter><posMax>118</posMax></speaker>
 <speaker><id>3</id><posMin>5</posMin><posCenter>63</posCenter><posMax>119</posMax></speaker>
